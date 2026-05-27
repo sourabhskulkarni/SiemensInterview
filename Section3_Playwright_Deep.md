@@ -162,3 +162,84 @@ for (const loc of locations) {
 
 **Why & How it aligns with the question:**
 This is a very common scenario in complex dashboards. It demonstrates understanding of typing, waiting for asynchronous dropdowns (auto-suggest), and verifying state changes in a DOM container.
+
+---
+
+## 13.4. File Uploads (Standard vs Hidden)
+**Question:** How do you handle file uploads, especially if the `<input type="file">` is hidden by a custom UI button?
+
+**Practical Snippet & Answer:**
+```javascript
+// 1. Standard approach (if input is visible)
+await page.locator('input[type="file"]').setInputFiles('path/to/test.pdf');
+
+// 2. Advanced approach (if input is hidden or triggered dynamically)
+const [fileChooser] = await Promise.all([
+    page.waitForEvent('filechooser'),
+    page.getByRole('button', { name: 'Upload Document' }).click() // Triggers the file chooser
+]);
+await fileChooser.setFiles('path/to/test.pdf');
+```
+**Why & How it aligns with the question:**
+Interviewers know that custom UI frameworks often hide the actual file input. Attempting to click a hidden input fails. The `Promise.all` approach using `waitForEvent('filechooser')` is the enterprise standard to handle this elegantly.
+
+---
+
+## 13.5. Handling JS Alerts & Dialogs
+**Question:** Your test clicks a 'Delete' button and a browser confirmation alert appears. How does Playwright handle this?
+
+**Practical Snippet & Answer:**
+```javascript
+// Playwright automatically dismisses alerts! You MUST attach a listener to accept it.
+page.on('dialog', async dialog => {
+    console.log(`Alert message was: ${dialog.message()}`);
+    await dialog.accept(); // Or dialog.dismiss()
+});
+
+await page.getByRole('button', { name: 'Delete User' }).click(); // This triggers the alert
+```
+**Why & How it aligns with the question:**
+This is a classic trap question. If a candidate says "I wait for the alert to appear and click OK," they are thinking in Selenium. Playwright auto-dismisses dialogs by default unless explicitly caught by the `page.on('dialog')` event listener.
+
+---
+
+## 13.6. Browser Pop-ups (New Tabs / Windows)
+**Question:** Clicking a link opens a PDF report in a completely new browser tab. How do you validate the contents of that new tab?
+
+**Practical Snippet & Answer:**
+```javascript
+// Start waiting for the new page BEFORE clicking the link
+const [newPage] = await Promise.all([
+    context.waitForEvent('page'),
+    page.getByRole('link', { name: 'Download PDF Report' }).click()
+]);
+
+// Wait for the new tab to fully load
+await newPage.waitForLoadState();
+
+// Validate the new tab
+await expect(newPage).toHaveTitle('Monthly Report');
+await newPage.getByRole('button', { name: 'Close' }).click();
+
+// Switch back to original page
+await page.bringToFront();
+```
+**Why & How it aligns with the question:**
+This tests your understanding of concurrency (`Promise.all`) and Playwright's `BrowserContext`. You must capture the new page instance as it's spawned to interact with it, rather than trying to use `page.locator()` which only looks at the original tab.
+
+---
+
+## 13.7. Shadow DOM Locators
+**Question:** The element you are trying to click is inside a Web Component with a closed/open Shadow Root. How do you locate it?
+
+**Practical Snippet & Answer:**
+```javascript
+// Playwright pierces open Shadow DOMs automatically!
+// You don't need any special syntax for open shadow roots.
+await page.getByRole('button', { name: 'Submit' }).click();
+
+// If you MUST target something explicitly inside a shadow root using CSS:
+await page.locator('.custom-web-component >> css=.internal-button').click();
+```
+**Why & How it aligns with the question:**
+Another trap! Selenium requires complex JavaScript executors (`executeScript`) to pierce Shadow DOMs. Playwright's engine natively pierces open Shadow DOMs. You just write your locator as if the shadow root doesn't exist. This is a huge selling point for why Playwright is superior for modern web apps like Salesforce (LWC).
