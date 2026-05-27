@@ -94,3 +94,71 @@ await page.getByRole('button', { name: '15', exact: true }).click();
 **Why & How it aligns with the question:**
 This is the simplest way to handle standard Date Pickers. 
 *Cross Question Answers:* Timezone issues occur because Playwright runs in UTC on CI/CD but locally on IST. Fix this by passing `timezoneId: 'Asia/Kolkata'` in the Playwright config. For complex React calendars, do not click dates; instead, try injecting the date string directly via `page.fill('#date', '2026-08-03')` or `evaluate()` for robustness.
+
+---
+
+## 13.1. Standard Select Dropdown vs Custom UI Dropdown
+**Question:** How do you handle `<select>` dropdowns versus modern custom `<div>` dropdowns?
+
+**Practical Snippet & Answer:**
+```javascript
+// 1. Standard HTML <select> Dropdown (Simple)
+await page.locator('#country').selectOption({ label: 'India' });
+// or by value: await page.locator('#country').selectOption('IND');
+
+// 2. Custom UI Dropdown (React/Angular Custom Divs)
+await page.locator('#custom-dropdown-trigger').click(); // Open the menu
+await page.getByRole('option', { name: 'Pune' }).click(); // Select the item
+```
+
+**Why & How it aligns with the question:**
+Interviews often trick you by asking how to select a dropdown, expecting you to know the difference between native `<select>` tags (which use `.selectOption()`) and modern web frameworks that use hidden divs (which require a `.click()` to open and another `.click()` to select).
+
+---
+
+## 13.2. Multiselect Checkbox Handling
+**Question:** How do you select multiple checkboxes dynamically from a list?
+
+**Practical Snippet & Answer:**
+```javascript
+const rolesToSelect = ['Admin', 'Editor', 'Viewer'];
+
+for (const role of rolesToSelect) {
+    // Locate the checkbox by its associated label text and check it
+    await page.getByLabel(role).check();
+}
+
+// To verify they are checked:
+for (const role of rolesToSelect) {
+    await expect(page.getByLabel(role)).toBeChecked();
+}
+```
+
+**Why & How it aligns with the question:**
+Shows you know how to iterate over an array of data to dynamically interact with UI elements. `.check()` is preferred over `.click()` for checkboxes because `.check()` ensures the box is checked regardless of its current state, whereas `.click()` might uncheck it if it was already checked!
+
+---
+
+## 13.3. Multiselect Textbox (Location/Tags Filter)
+**Question:** How do you automate a multiselect textbox where you type to search, select an option, and it appears as a tag (e.g., Location filters)?
+
+**Practical Snippet & Answer:**
+```javascript
+const locations = ['Pune', 'Mumbai', 'Bangalore'];
+
+for (const loc of locations) {
+    // 1. Type the location into the search box
+    await page.getByPlaceholder('Search locations...').fill(loc);
+    
+    // 2. Wait for the auto-suggest dropdown to appear and click the exact match
+    await page.getByRole('listbox').getByText(loc, { exact: true }).click();
+}
+
+// 3. Verify all selected tags appear in the filter box
+for (const loc of locations) {
+    await expect(page.locator('.selected-tags-container')).toContainText(loc);
+}
+```
+
+**Why & How it aligns with the question:**
+This is a very common scenario in complex dashboards. It demonstrates understanding of typing, waiting for asynchronous dropdowns (auto-suggest), and verifying state changes in a DOM container.
