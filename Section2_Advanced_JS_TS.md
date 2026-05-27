@@ -85,3 +85,13 @@ class LoginPage extends BasePage {
 **Why & How it aligns with the question:**
 Abstract classes are a powerful OOP concept used in Page Object Models. They allow you to share common code (like an `openUrl` method) across all pages, while enforcing child classes to define their own specific logic (like `verifyPageLoaded`).
 *Cross Question Answers:* An `interface` is just a contract with zero implementation. An `abstract class` can provide default methods. Also, a class can implement *multiple* interfaces, but can only inherit from *one* abstract class (no multiple inheritance).
+
+---
+
+## 8.1. Architectural Alignment: TS Design in your AI Tool
+**Question:** How did you use advanced TypeScript features (Interfaces and Abstract Classes) to architect your MCP CLI tool?
+
+**Answer & Explanation:**
+You want to show that your TypeScript knowledge scales beyond basic page objects.
+"I used Abstract Classes and Interfaces to make the AI logic in my CLI model-agnostic (applying SOLID principles). I created an `interface ILLMProvider` and an `abstract class AIPromptBuilder` which contains the default logic for stripping PII from network payloads. 
+Because of this strict architecture, if the company decides to switch from GitHub Copilot to OpenAI or Anthropic, I don't have to rewrite the core engine. I simply implement a new child class that `extends AIPromptBuilder`. This proves my TS code is highly scalable and maintainable."

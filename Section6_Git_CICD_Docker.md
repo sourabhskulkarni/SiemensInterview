@@ -78,3 +78,47 @@ CMD ["npx", "playwright", "test"]
 **Why & How it aligns with the question:**
 Containerization guarantees the test runs exactly the same on CI as it does on your laptop.
 *Cross Question Answers:* Docker ensures there are no "It works on my machine" issues. The Microsoft base image manages browser dependencies natively, so you don't have to write scripts to download Chrome/Webkit binaries on Linux servers.
+
+---
+
+## 24. CI/CD Stages Explanation
+**Question:** Explain the typical stages of a CI/CD pipeline where your automation suite is integrated.
+
+**Answer & Explanation:**
+In an enterprise environment (like GitLab CI or Azure DevOps), a pipeline isn't just one step. It's broken into logical stages.
+
+**Typical Stages:**
+1. **Build (`npm ci` / `docker build`):** Compiles the application code and installs test dependencies.
+2. **Lint & Static Analysis (`eslint` / `SonarQube`):** Runs static code checks before any tests execute to catch basic syntax/formatting errors.
+3. **Unit Tests (Jest / Mocha):** Executes developer unit tests. Fast and isolated.
+4. **Deploy to Lower Env (Dev/QA):** Deploys the built artifact to a staging or QA server.
+5. **E2E Automation (Playwright):** *This is our stage.* Once the code is deployed to QA, the pipeline triggers our Playwright smoke/regression suite against the live QA environment.
+6. **Performance (K6):** If E2E passes, load testing runs to ensure no performance degradation.
+7. **Deploy to Prod:** (Usually requires a manual approval gate in ADO/GitLab).
+
+*Cross Question Answers:* If E2E fails, the pipeline immediately halts (fails the build), preventing the bad code from moving to the Production deployment stage.
+
+---
+
+## 25. CI/CD Security Gates
+**Question:** How are security gates implemented and validated in your CI/CD pipeline?
+
+**Answer & Explanation:**
+Security isn't just an afterthought; it's a mandatory pipeline gate. If security checks fail, the pipeline stops.
+
+**Practical Implementation:**
+1. **Secret Scanning:** Using tools like GitLab's native secret detection or `git-secrets` to ensure developers (or QA) haven't hardcoded passwords or API keys in the code.
+2. **Dependency Vulnerability (SCA):** Running `npm audit` or tools like *Snyk*. If a third-party NPM package used in our framework has a known CVE (vulnerability), the pipeline fails.
+3. **DAST (Dynamic Application Security Testing):** Tools like *OWASP ZAP* can be run alongside Playwright. While Playwright navigates the UI, ZAP proxies the network traffic and scans for SQL Injection or XSS vulnerabilities dynamically.
+
+**Practical Snippet (GitLab CI):**
+```yaml
+security_scan:
+  stage: test
+  script:
+    - npm audit --audit-level=high # Fails pipeline if HIGH vulnerabilities exist
+    - snyk test # Third-party security gate
+  allow_failure: false # Pipeline STOPS if this fails
+```
+
+*Cross Question Answers:* "How do you manage tokens safely in automation?" We never hardcode them. We inject them into the Playwright tests dynamically at runtime using CI/CD Masked Variables (`process.env.API_TOKEN`), ensuring they never appear in Git logs, console outputs, or HTML reports.

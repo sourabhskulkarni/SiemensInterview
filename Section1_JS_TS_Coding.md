@@ -142,3 +142,13 @@ function debounce(fn, delay) {
 **Why & How it aligns with the question:**
 Debounce limits the rate at which a function fires. It's heavily used in UI for search bars. 
 *Cross Question Answers:* Throttle fires a function exactly once every X milliseconds (like a steady heartbeat), while Debounce waits for the user to *stop* triggering it for X milliseconds before firing. In automation, it's used to avoid double-clicking or handling rapid events.
+
+---
+
+## 5.1. Architectural Alignment: How JS Concepts Power Your AI Tool
+**Question:** How did you apply these core JavaScript concepts (like Recursion and the Event Loop) when building your MCP CLI AI Tool?
+
+**Answer & Explanation:**
+When interviewers ask basic coding questions, a Senior SDET strategically ties them back to enterprise features.
+1. **Recursion (Array Flattening):** "The AST (Abstract Syntax Tree) that my MCP CLI parses is essentially a deeply nested JSON object. To find the exact API payload node to patch, my script must recursively traverse this tree structure, applying the exact same recursive logic as the array flattening problem."
+2. **Event Loop (Promises):** "Sniffing Playwright network traffic in real-time (`page.on`) while simultaneously sending asynchronous API calls to an LLM requires deep mastery of the Node.js Microtask queue. If I didn't structure my Promises correctly, the heavy LLM network calls would block the single JavaScript thread, crashing the UI automation."
