@@ -95,3 +95,44 @@ Abstract classes are a powerful OOP concept used in Page Object Models. They all
 You want to show that your TypeScript knowledge scales beyond basic page objects.
 "I used Abstract Classes and Interfaces to make the AI logic in my CLI model-agnostic (applying SOLID principles). I created an `interface ILLMProvider` and an `abstract class AIPromptBuilder` which contains the default logic for stripping PII from network payloads. 
 Because of this strict architecture, if the company decides to switch from GitHub Copilot to OpenAI or Anthropic, I don't have to rewrite the core engine. I simply implement a new child class that `extends AIPromptBuilder`. This proves my TS code is highly scalable and maintainable."
+
+---
+
+## 8.2. Async / Await & Promise Combinators
+**Question:** Playwright relies entirely on asynchronous execution. Explain the difference between `Promise.all`, `Promise.allSettled`, `Promise.race`, and `Promise.any`. When would you use them in automation?
+
+**Practical Snippet & Answer:**
+```javascript
+// 1. Promise.all (Fails fast if ANY promise rejects)
+// Use Case: Waiting for a popup/file chooser AND clicking a button simultaneously.
+const [fileChooser] = await Promise.all([
+    page.waitForEvent('filechooser'),
+    page.locator('#upload-btn').click() // If this fails, the whole block throws immediately.
+]);
+
+// 2. Promise.allSettled (Waits for ALL promises, regardless of pass/fail)
+// Use Case: Hitting multiple independent APIs. If one fails, you still want the data from the others.
+const results = await Promise.allSettled([
+    request.get('/api/users'),
+    request.get('/api/orders')
+]);
+// results[0].status will be either 'fulfilled' or 'rejected'
+
+// 3. Promise.race (Returns the FIRST promise to resolve OR reject)
+// Use Case: Implementing a custom timeout wrapper.
+const response = await Promise.race([
+    page.waitForResponse('**/api/data'),
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout!')), 5000))
+]);
+
+// 4. Promise.any (Returns the FIRST promise to RESOLVE successfully, ignoring rejections)
+// Use Case: Querying multiple redundant backend servers and proceeding with the fastest success.
+const fastResponse = await Promise.any([
+    request.get('https://primary.com/ping'),
+    request.get('https://backup.com/ping')
+]);
+```
+
+**Why & How it aligns with the question:**
+Playwright is fundamentally built on `async/await`. A senior engineer must know that `await` pauses the execution of that specific block until the Promise resolves. 
+*Cross Question Answers:* If an interviewer asks "Why use `Promise.all` for a file upload or popup?", the answer is: "Because `page.waitForEvent` must start listening *before* the click happens. If you `await page.click()` first, the popup event might fire and finish before `waitForEvent` even starts listening, causing a deadlock. `Promise.all` executes them concurrently."
