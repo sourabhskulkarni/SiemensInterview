@@ -58,33 +58,60 @@ TypeScript strictly types automation frameworks. Knowing when to use which is an
 
 ---
 
-## 8. Abstract Class vs Interface
-**Question:** Explain `abstract class LoginPage`.
+## 8. Type vs Interface vs Abstract Class (The Practical Framework Approach)
+**Question:** Explain the difference between `type`, `interface`, and `abstract class`. How do you use them practically in your framework?
 
-**Practical Snippet & Answer:**
+**The Simple Definitions First:**
+> "To put it simply, here is how I differentiate them:
+> 1. **`type`**: This is just a custom alias for specific, exact values. It’s like a strict drop-down menu of choices.
+> 2. **`interface`**: This is just a blueprint or a strict checklist. It tells you *what* names or properties must exist, but has zero actual logic or code inside it.
+> 3. **`abstract class`**: This is a base template that *does* have actual, reusable code inside it, but you can't use it directly on its own—you have to extend it."
+
+**Practical Snippet & Answer (The Framework Context):**
+> "In my framework, I don't just use these randomly. I have a very specific architectural rule for when to use each:"
+
 ```typescript
-// Line 1: Abstract classes cannot be instantiated directly.
+// 1. TYPE: Used for strict literal selections (e.g., Browser Configuration)
+// I use types to restrict engineers to specific browser values so they can't misspell it in the config.
+type BrowserChoice = 'chromium' | 'firefox' | 'webkit';
+
+// 2. INTERFACE: Used as a contract for defining Locators/Selectors
+// I use interfaces to enforce that every Page Object must define its locators, but without any actual logic.
+interface ILoginPageLocators {
+    readonly usernameInput: string;
+    readonly passwordInput: string;
+    readonly loginBtn: string;
+}
+
+// 3. ABSTRACT CLASS: Used for the BasePage to hold runtime generic logic
+// I use an abstract class for the BasePage. It provides actual reusable implementation (like clickElement), 
+// but forces child pages to implement their own specific logic (like verifyPageLoaded).
 abstract class BasePage {
-    // Line 2: Concrete method with implementation. Interfaces CANNOT do this.
-    async openUrl(url: string) {
-        console.log(`Navigating to ${url}`);
+    // Concrete method with logic (Interfaces can't do this)
+    async clickElement(selector: string) {
+        console.log(`Waiting and clicking element: ${selector}`);
     }
     
-    // Line 3: Abstract method with NO implementation. Child classes MUST implement it.
+    // Abstract method (Forces the child class to implement it)
     abstract verifyPageLoaded(): Promise<boolean>;
 }
 
-// Line 4: Child class extends the abstract class.
-class LoginPage extends BasePage {
+// 4. BRINGING IT TOGETHER in a Concrete Page Object
+class LoginPage extends BasePage implements ILoginPageLocators {
+    // Satisfying the Interface contract
+    usernameInput = '#user';
+    passwordInput = '#pass';
+    loginBtn = '#login';
+
+    // Satisfying the Abstract Class contract
     async verifyPageLoaded() {
-        return true; // Implementation forced here
+        return true; 
     }
 }
 ```
 
-**Why & How it aligns with the question:**
-Abstract classes are a powerful OOP concept used in Page Object Models. They allow you to share common code (like an `openUrl` method) across all pages, while enforcing child classes to define their own specific logic (like `verifyPageLoaded`).
-*Cross Question Answers:* An `interface` is just a contract with zero implementation. An `abstract class` can provide default methods. Also, a class can implement *multiple* interfaces, but can only inherit from *one* abstract class (no multiple inheritance).
+**Why this is a 10/10 Answer:**
+You aren't just reciting definitions from MDN. You are showing them exactly how an Architect uses TypeScript features to build guardrails into a complex framework (Types for config strictness, Interfaces for locator shape, Abstract Classes for reusable runtime actions).
 
 ---
 
@@ -98,44 +125,61 @@ Because of this strict architecture, if the company decides to switch from GitHu
 
 ---
 
-## 8.2. Async / Await & Promise Combinators
-**Question:** Playwright relies entirely on asynchronous execution. Explain the difference between `Promise.all`, `Promise.allSettled`, `Promise.race`, and `Promise.any`. When would you use them in automation?
+## 8.2. Async / Await & Promise Combinators (The Practical Framework Approach)
+**Question:** Playwright relies entirely on asynchronous execution. Explain what async/await/Promises are, and the difference between `Promise.all`, `Promise.allSettled`, `Promise.race`, and `Promise.any`.
 
-**Practical Snippet & Answer:**
+**The Simple Definitions First:**
+> "To explain async/await simply, I tie it directly to how Playwright executes:
+> 1. **`Promise`**: This is just a background task that hasn't finished yet. For example, when an auto-save API fires after uploading a file, Playwright creates a Promise. It means 'I am waiting for the backend to respond, and I will let you know if it passes or fails.'
+> 2. **`async`**: This is just a label on a function telling JavaScript, 'This function contains background tasks (Promises) that take time, like clicking or API calls.'
+> 3. **`await`**: This tells Playwright to pause the test exactly at that line and wait for the background task (like an API response or file upload) to fully finish before moving to the next step."
+
+**Practical Snippet & Answer (The Promise Combinators in Automation):**
+> "In my framework, handling multiple Promises concurrently is where the real power is. Here is how and why I use the different combinators:"
+
 ```javascript
-// 1. Promise.all (Fails fast if ANY promise rejects)
-// Use Case: Waiting for a popup/file chooser AND clicking a button simultaneously.
-const [fileChooser] = await Promise.all([
-    page.waitForEvent('filechooser'),
-    page.locator('#upload-btn').click() // If this fails, the whole block throws immediately.
+// 1. Promise.all -> "All or Nothing" (Fails fast if ANY promise rejects)
+// Use Case: Clicking a button and waiting for the API response.
+// In Playwright, you MUST start listening for the response at the exact same time you click the button.
+// If you click first, the API might finish before you start listening, causing a timeout.
+const [response] = await Promise.all([
+    page.waitForResponse('**/api/submit'), // Start listening
+    page.locator('#submit-btn').click()    // Perform the action
+]);
+// If the click fails, or the API returns an error, the block fails immediately.
+
+// 2. Promise.allSettled -> "Finish Everything" (Waits for all, pass or fail)
+// Use Case: Playwright Fixture / Hook Teardown.
+// After a test, we want to completely wipe the browser state. If clearing cookies fails 
+// for some reason, we STILL want it to attempt clearing local storage so the next test doesn't fail.
+const teardownStatus = await Promise.allSettled([
+    context.clearCookies(),
+    page.evaluate(() => window.localStorage.clear()),
+    page.evaluate(() => window.sessionStorage.clear())
 ]);
 
-// 2. Promise.allSettled (Waits for ALL promises, regardless of pass/fail)
-// Use Case: Hitting multiple independent APIs. If one fails, you still want the data from the others.
-const results = await Promise.allSettled([
-    request.get('/api/users'),
-    request.get('/api/orders')
-]);
-// results[0].status will be either 'fulfilled' or 'rejected'
-
-// 3. Promise.race (Returns the FIRST promise to resolve OR reject)
-// Use Case: Implementing a custom timeout wrapper.
-const response = await Promise.race([
-    page.waitForResponse('**/api/data'),
-    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout!')), 5000))
+// 3. Promise.race -> "First to Finish Wins (Pass or Fail)"
+// Use Case: Racing UI States (Success vs Error).
+// After filling mandatory fields, the Submit button should enable. But if there's a validation issue, 
+// an error toast appears. We race them to see which UI state happens first so we don't wait blindly.
+const outcome = await Promise.race([
+    page.waitForSelector('#submit-btn:not([disabled])'), // State 1: Button enables
+    page.waitForSelector('.error-toast') // State 2: Error appears
 ]);
 
-// 4. Promise.any (Returns the FIRST promise to RESOLVE successfully, ignoring rejections)
-// Use Case: Querying multiple redundant backend servers and proceeding with the fastest success.
-const fastResponse = await Promise.any([
-    request.get('https://primary.com/ping'),
-    request.get('https://backup.com/ping')
+// 4. Promise.any -> "First SUCCESS Wins" (Ignores failures)
+// Use Case: Optional Fields enabling a Next Button.
+// The user only needs to fill ANY ONE of the 3 optional fields to enable the Next button.
+// We use Promise.any to wait until the first successful input triggers the button state.
+const nextButtonEnabled = await Promise.any([
+    page.locator('#phone-input').fill('1234567890').then(() => page.waitForSelector('#next-btn:not([disabled])')),
+    page.locator('#email-input').fill('test@test.com').then(() => page.waitForSelector('#next-btn:not([disabled])')),
+    page.locator('#address-input').fill('123 Main St').then(() => page.waitForSelector('#next-btn:not([disabled])'))
 ]);
 ```
 
-**Why & How it aligns with the question:**
-Playwright is fundamentally built on `async/await`. A senior engineer must know that `await` pauses the execution of that specific block until the Promise resolves. 
-*Cross Question Answers:* If an interviewer asks "Why use `Promise.all` for a file upload or popup?", the answer is: "Because `page.waitForEvent` must start listening *before* the click happens. If you `await page.click()` first, the popup event might fire and finish before `waitForEvent` even starts listening, causing a deadlock. `Promise.all` executes them concurrently."
+**Why this is a 10/10 Answer:**
+You completely avoided dry textbook definitions like "the event loop" or "microtask queue." Instead, you immediately tied the core concepts to highly relatable, real-world framework scenarios (API network interception, racing UI button states, and resilient teardowns). This proves you don't just know the syntax—you know exactly how to use it to optimize execution time in a Senior SDET role.
 
 ---
 
