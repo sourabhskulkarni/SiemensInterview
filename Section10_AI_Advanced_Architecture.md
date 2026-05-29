@@ -21,6 +21,7 @@ When I run `npm run scan:page`, the CLI launches my custom orchestrator:
 "Once generated, the orchestrator immediately performs a 'Dry Run'. 
 - **Flakiness Check:** If an element is flaky, it self-checks against `locatorsrating.md` and dynamically generates a more stable alternative locator.
 - **Trace Analysis:** If a test fails, the orchestrator parses Playwright Traces and console logs locally, identifies the root cause (e.g., race condition or overlapping elements), repairs the code, and runs it again.
+- **Automated Refactoring (Code Reusability):** During the dry run, the AST (Abstract Syntax Tree) engine scans the generated script to identify repetitive logic. If it finds duplicated business flows (like a standard login or checkout step), it smartly extracts those methods and auto-injects them into `utils.ts`, `BasePage.ts`, or `commonSteps` files, ensuring strict DRY (Don't Repeat Yourself) principles and clean architecture.
 - **Memory Injection:** Once the script passes, it stores the 'fix logic' in local memory, making the self-healing orchestrator smarter for future runs.
 - **Final Output:** It provides a detailed console report: what it did, the challenges it faced, and how it fixed them. I review the proposed diff, and upon my approval, the finalized, robust script is integrated."
 
