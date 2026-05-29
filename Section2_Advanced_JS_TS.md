@@ -166,3 +166,50 @@ await page.route('**/api/users', route => {
 **Why & How it aligns with the question:**
 A Senior SDET must know that Playwright's core API relies heavily on callbacks. For example, `test('name', async ({ page }) => { ... })` uses an anonymous async callback function. 
 *Cross Question Answers:* If an interviewer asks "What is Callback Hell?", you explain that before Promises and `async/await`, chaining multiple asynchronous operations required nesting callbacks inside callbacks, leading to unreadable "pyramid of doom" code. We avoid this in Playwright by using `async/await`.
+
+---
+
+## 8.4. Node.js Modules: CommonJS vs ES6 Imports
+**Question:** Since Playwright runs on Node.js (as per the JD), explain the difference between CommonJS (`require`) and ES Modules (`import`). Which one does your framework use?
+
+**Practical Snippet & Answer:**
+```javascript
+// 1. CommonJS (The legacy Node.js default)
+const { test, expect } = require('@playwright/test');
+module.exports = { myHelper };
+
+// 2. ES6 Modules (The modern standard used in TypeScript)
+import { test, expect } from '@playwright/test';
+export const myHelper = () => {};
+```
+**Why & How it aligns with the question:**
+An SDET Lead must understand Node.js architecture. Playwright supports both, but ES Modules (ESM) allow for static analysis, making framework imports cleaner. Since you write your framework in TypeScript, you naturally write in ES Modules, and the compiler transpiles it so Node.js can execute it efficiently.
+
+---
+
+## 8.5. Advanced Error Handling (Try / Catch / Finally)
+**Question:** How do you handle unpredictable errors gracefully in your automation scripts without crashing the entire suite or causing memory leaks?
+
+**Practical Snippet & Answer:**
+```javascript
+test('Database cleanup on failure', async ({ page }) => {
+    let dbConnection;
+    try {
+        dbConnection = await connectToDB(); // Connect to backend DB
+        await page.goto('/dashboard');
+        await expect(page.locator('.header')).toBeVisible(); // If this fails, code jumps to catch
+    } catch (error) {
+        console.error(`Test failed abruptly: ${error.message}`);
+        // Optionally trigger a custom Slack/Teams alert here via API
+        throw error; // MUST rethrow so Playwright correctly marks the test as FAILED
+    } finally {
+        // The finally block ALWAYS executes, whether the test passed OR failed!
+        if (dbConnection) {
+            await dbConnection.close();
+            console.log('Database connection securely closed.');
+        }
+    }
+});
+```
+**Why & How it aligns with the question:**
+The JD emphasizes building robust, scalable frameworks. Relying only on Playwright's default assertions isn't enough when dealing with DBs or third-party APIs. Using `finally` guarantees that expensive resources (like DB connections, API sessions, or open file streams) are safely closed even if the UI assertion fails, preventing memory leaks and locked databases.
