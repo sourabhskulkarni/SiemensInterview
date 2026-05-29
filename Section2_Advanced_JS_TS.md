@@ -136,3 +136,33 @@ const fastResponse = await Promise.any([
 **Why & How it aligns with the question:**
 Playwright is fundamentally built on `async/await`. A senior engineer must know that `await` pauses the execution of that specific block until the Promise resolves. 
 *Cross Question Answers:* If an interviewer asks "Why use `Promise.all` for a file upload or popup?", the answer is: "Because `page.waitForEvent` must start listening *before* the click happens. If you `await page.click()` first, the popup event might fire and finish before `waitForEvent` even starts listening, causing a deadlock. `Promise.all` executes them concurrently."
+
+---
+
+## 8.3. Anonymous Functions & Callbacks
+**Question:** What is a Callback function and an Anonymous function? How are they used in your Playwright framework?
+
+**Practical Snippet & Answer:**
+```javascript
+// 1. Callback Function: A function passed as an argument to another function
+function executeTest(testName, callback) {
+    console.log(`Starting test: ${testName}`);
+    callback(); // Executing the passed function
+}
+
+// 2. Anonymous Function: A function without a name (often used as callbacks)
+// Here, the second argument () => { ... } is an anonymous arrow function acting as a callback.
+executeTest('Login Scenario', () => {
+    console.log('Test executed successfully!');
+});
+
+// Playwright Native Example:
+// `route => { ... }` is an anonymous callback function passed into page.route()
+await page.route('**/api/users', route => {
+    route.fulfill({ status: 200, body: 'Mocked Data' });
+});
+```
+
+**Why & How it aligns with the question:**
+A Senior SDET must know that Playwright's core API relies heavily on callbacks. For example, `test('name', async ({ page }) => { ... })` uses an anonymous async callback function. 
+*Cross Question Answers:* If an interviewer asks "What is Callback Hell?", you explain that before Promises and `async/await`, chaining multiple asynchronous operations required nesting callbacks inside callbacks, leading to unreadable "pyramid of doom" code. We avoid this in Playwright by using `async/await`.
