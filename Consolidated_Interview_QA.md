@@ -46,6 +46,8 @@
 > - **BDD & POM:** BDD feature files define simple-language scenarios, which map directly to a structured Page Object Model (POM) for clean maintenance.
 > - **Utils & Hooks:** Standardized folders managing shared utility methods and browser lifecycle hooks (browser launch, context, cookies, etc.).
 > - **Custom SSO Fixtures:** Crucial for our enterprise security. Since our applications support SSO authentication via QR scanning or physical security tokens like YubiKeys, we engineered custom Playwright fixtures that spin up authenticated sessions using pre-configured local browser profiles.
+> - **Config & .env Layer:** Multi-environment handling (QA, Staging, Prod) using `dotenv` to load credentials and endpoints dynamically. These are loaded into a strongly-typed TypeScript configuration class to ensure fail-fast checking of missing parameters at runtime.
+> - **Test Data Management:** Isolated test data layer utilizing structured JSON schemas and TypeScript mock models. Dynamic data is seeded and torn down in real-time via API calls rather than hardcoding static databases.
 > - **Reporting & CI/CD:** Advanced Cucumber reports enriched with screenshots on failure, JSON logs, and trace zip files, running on every Pull Request.
 > - **MCP + CLI Layer:** Our custom tooling for self-healing, memory orchestration, and guided execution.
 >
