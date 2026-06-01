@@ -80,24 +80,59 @@ Tests dependency management.
 
 ---
 
-## 18. API + UI Hybrid Validation
-**Question:** Combine API and UI in one test.
+## 18. API + UI Hybrid Validation (The Right Way)
+**Question:** How do you combine API and UI in one test, and what are the risks?
 
 **Practical Snippet & Answer:**
+> "A lot of people use the API to create data to save time. However, there is a massive risk here: **If the UI form is broken and isn't sending the correct payload to the backend, you will never catch the bug because you bypassed the UI.** 
+> 
+> Because of this, I strictly divide Hybrid testing into two different strategies:"
+
 ```javascript
-test('Hybrid Create and Verify', async ({ page, request }) => {
-    // Line 1: Pre-condition - Create data directly via API (Takes 0.1 seconds)
+// STRATEGY 1: E2E Integration (UI Action -> API Verification)
+// Use this to prove the frontend is actually sending the correct payload to the backend.
+// Risk avoided: If the UI form has a bug (e.g., missing field), the API call will carry wrong data.
+test('Verify UI sends correct payload to Backend', async ({ page, request }) => {
+    // 1. Fill the form on the UI as a real user would
+    await page.locator('#product-name').fill('Laptop');
+    await page.locator('#quantity').fill('2');
+    await page.locator('#customer-id').fill('CUST_001');
+
+    // 2. Start listening for the API call AND click the button at the same time (Promise.all pattern)
+    const [apiResponse] = await Promise.all([
+        page.waitForResponse('**/api/orders'),  // Intercept the actual network call
+        page.locator('#create-order-btn').click()
+    ]);
+
+    // 3. Verify what the frontend ACTUALLY sent to the backend (the real payload)
+    const responseBody = await apiResponse.json();
+    expect(apiResponse.status()).toBe(201);
+    expect(responseBody.item).toBe('Laptop');       // Did frontend send the right item?
+    expect(responseBody.customerId).toBe('CUST_001'); // Did it send the right customer?
+});
+
+// STRATEGY 2: State Setup (API Action -> UI Verification)
+// Use this ONLY for downstream tests where the UI creation has ALREADY been proven to work.
+test('Verify Order Edit Page Loads', async ({ page, request }) => {
+    // 1. Bypass UI to instantly set up state (0.1 seconds instead of 10 seconds)
     const res = await request.post('/api/orders', { data: { item: 'Laptop' } });
     const orderId = (await res.json()).id;
     
-    // Line 2: Navigate to UI and verify the data rendered properly (Takes 2 seconds)
-    await page.goto(`/orders/${orderId}`);
-    await expect(page.locator('.order-title')).toHaveText('Laptop');
+    // 2. Jump straight to the downstream page being tested
+    await page.goto(`/orders/${orderId}/edit`);
+    await expect(page.locator('.edit-title')).toBeVisible();
 });
 ```
 
-**Why & How it aligns with the question:**
-Hybrid testing is the mark of a Senior SDET. Creating an order via UI might require 15 clicks (takes 10 seconds). Creating it via API takes 0.1 seconds. You use the API to instantly set up state, and the UI just to verify it rendered, drastically cutting regression time.
+**Why this is a 10/10 Answer:**
+You didn't just write a script. You anticipated a major architectural flaw (bypassing the frontend payload bug). By explaining *when* to use each strategy, you prove you design tests strategically:
+
+| Strategy | When to Run | Why |
+|---|---|---|
+| **Strategy 1** (UI → API) | **Smoke / Integration Suite** (on every deployment) | Verifies the frontend contract is intact. Catches payload bugs before regression starts. |
+| **Strategy 2** (API → UI) | **Full Regression Suite in CI** | Once Smoke has proven the UI sends correct data, API setup bypasses the UI to set up state in milliseconds, cutting total CI execution time significantly. |
+
+> *"In our pipelines, Smoke runs first on every pull request — that's where Strategy 1 lives. If Smoke passes, we trigger the full Regression suite where Strategy 2 dominates. This means we never blindly skip the frontend, but we also never waste CI minutes on repetitive UI setup when it's already been validated."*
 
 ---
 
@@ -292,33 +327,54 @@ export default function () {
 **Answer & Explanation:**
 When an interviewer asks this, they are verifying if you actually built the AI tool or if you just used a plugin. You must explain *how* the data is extracted from the network layer before the AI even touches it.
 
+**Technology Stack (Not Rest Assured — we are Node.js, not Java):**
+
+| Purpose | Technology Used |
+|---|---|
+| **API calls in tests** | Playwright `APIRequestContext` (`request.get/post/put`) — our Rest Assured equivalent |
+| **Network interception** | Playwright `page.on('request')` — captures live HTTP calls during UI execution |
+| **JSON Schema validation** | `Ajv` (npm package) — compares live payload shape against stored JSON schema |
+| **Script file rewriting** | `ts-morph` (npm package) — parses and rewrites TypeScript AST nodes without breaking formatting |
+| **File read/write** | Node.js `fs` module — reads existing test files and writes patched versions |
+| **CLI orchestration** | Custom Node.js CLI using `commander` npm package |
+
 **The Mechanical Process:**
-"The AI is only as good as the data it receives. During my Playwright UI execution, I don't just click buttons; I use Playwright's native `page.on('request')` listeners to build a live 'Network Map'. 
+> "The AI is only as good as the data it receives. During Playwright UI execution, I use `page.on('request')` to build a live 'Network Map'. When a developer changes a `POST` payload in the application, this listener captures it in real-time. I extract the HTTP Method (`req.method()`), the Endpoint (`req.url()`), and the JSON Payload (`req.postDataJSON()`).
+>
+> `Ajv` then validates the live payload against my stored JSON schema. If a new field appears (e.g., `shipping_method: 'express'`), Ajv flags the mismatch. `ts-morph` then opens the existing TypeScript API test file, locates the correct assertion block using AST traversal, and injects the missing field — without touching any other part of the file."
 
-When a developer changes a `POST` request payload in the application, my Playwright listener captures it in real-time. I extract the HTTP Method (`req.method()`), the Endpoint (`req.url()`), and the JSON Payload (`req.postDataJSON()`). 
+**Practical Snippet (The Sniffer + Ajv + ts-morph Pipeline):**
+```typescript
+import Ajv from 'ajv';
+import { Project } from 'ts-morph'; // AST manipulation
 
-My MCP CLI then takes this live data and compares it against the AST (Abstract Syntax Tree) of my *existing* Playwright API test files. If the live payload has a new field (e.g., `shipping_method: 'express'`), the CLI flags a mismatch. The AI then proposes a code diff to inject that exact field into my API validation script."
+const ajv = new Ajv();
 
-**Practical Snippet (The Sniffer Logic):**
-```javascript
-// This runs in a global hook or fixture to sniff traffic during UI tests
-page.on('request', async req => {
-    // Only intercept our backend API calls, ignoring analytics/images
+// STEP 1: Intercept live network traffic during UI test execution
+page.on('request', async (req) => {
     if (req.url().includes('/api/v1/orders') && req.method() === 'POST') {
         const livePayload = req.postDataJSON();
-        
-        // MCP CLI validates the live payload against existing API test scripts
-        const diff = await mcpValidator.compareWithExistingApiTest('CreateOrder', livePayload);
-        
-        if (diff.hasMismatch) {
-            console.log(`[AI Alert] The UI sent a new payload structure for POST /orders.`);
-            console.log(`Missing fields in your API script: ${diff.missingFields.join(', ')}`);
-            
-            // Generate the patch for the API test file for developer review
-            await mcpValidator.generateApiScriptPatch(diff); 
+
+        // STEP 2: Validate against stored schema using Ajv
+        const storedSchema = require('./schemas/createOrder.json');
+        const validate = ajv.compile(storedSchema);
+        const isValid = validate(livePayload);
+
+        if (!isValid) {
+            console.log(`[Ajv] Schema mismatch: ${JSON.stringify(validate.errors)}`);
+
+            // STEP 3: Use ts-morph to patch the existing API test file (AST rewrite)
+            const project = new Project();
+            const sourceFile = project.addSourceFileAtPath('./src/pages/API/OrderApiPage.ts');
+
+            // Find the createOrder method and inject the missing field
+            const method = sourceFile.getFunction('createOrder');
+            method?.addStatements(`expect(res.body.shipping_method).toBeDefined();`);
+            await project.save(); // Saves the updated TypeScript file
         }
     }
 });
 ```
 
-**Why & How it aligns:** This proves deep architectural knowledge. It shows you understand how to extract the exact HTTP methods, payloads, and validation parameters from the Chromium network layer programmatically, and how to use that raw data to feed a custom AI engine.
+**Why this is a 10/10 Answer:**
+You named specific technologies (`Ajv`, `ts-morph`, `APIRequestContext`) instead of vague terms like "AI magic". This proves you actually built this system and understand each layer — network capture, schema validation, and AST-level file rewriting — as separate, composable steps.
