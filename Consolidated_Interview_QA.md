@@ -1,438 +1,718 @@
 # Siemens SDET Interview — Consolidated Q&A (60-Minute Format)
 
-> **Purpose:** This is your single-file rapid revision guide. It contains the **25 most likely questions** for a 1-hour Siemens SDET virtual interview, mapped directly to the JD requirements and your CV claims. Each answer is kept short enough to say out loud in **60-90 seconds**.
+> **Purpose:** This is your single-file rapid revision guide, specifically tailored to the Siemens Job Description (JD). It contains the **25 most critical questions & answers** for a 1-hour Siemens SDET virtual interview, emphasizing Playwright proficiency, code-based API test automation, solid JavaScript programming, and DevOps expertise (Docker, GitLab CI/CD, and YAML configuration). Each main answer is designed to be communicated clearly in **60-90 seconds**.
 > 
-> 🔄 **Enriched Edition:** Every main question now includes a **challenging follow-up Cross-Question & Answer** representing exactly what real interviewers ask when they want to probe your depth.
+> 🔄 **Enriched Edition:** Every core question includes a **challenging follow-up Cross-Question & Answer** simulating exactly how a strict technical interviewer or Principal SDET will probe your actual depth and hands-on coding capability.
 
 ---
 
-## 🎯 Interview Flow Strategy (60 Minutes)
+## 🎯 Strategic Timeline & Flow (60 Minutes)
 
-| Phase | Time | What Happens |
-|---|---|---|
-| **Introduction** | 0–7 min | "Tell me about yourself" → Hook with AI CLI |
-| **Framework Deep Dive** | 7–25 min | Framework architecture + Cross-questioning |
-| **JS/TS + Playwright Concepts** | 25–40 min | Async/Await, Promises, Locators, Network |
-| **API Automation** | 40–50 min | Hybrid testing, Chained APIs, Mocking |
-| **CI/CD + Test Strategy** | 50–58 min | Pipelines, Docker, Agile, Test Plan |
-| **Closing** | 58–60 min | Questions for the interviewer |
+Siemens SDET evaluations are highly technical and code-heavy. To succeed, you must avoid long framework monologues and prioritize demonstrating your hands-on coding and DevOps capabilities. Use this time management strategy:
+
+| Phase | Duration | Focus Area | Key Evaluation Metric |
+|---|---|---|---|
+| **Phase 1: Introduction** | 0–5 min | "Tell me about yourself" | Communication & E2E/DevOps Hook |
+| **Phase 2: UI Framework Deep Dive** | 5–15 min | Playwright Architecture | Locator strategy, POM scaling, trace analysis |
+| **Phase 3: JavaScript Coding & Logic** | 15–35 min | Hands-on JS challenges, Event Loop | Promises, array methods, closures, custom retries |
+| **Phase 4: API Test Automation** | 35–45 min | Chained API testing via code | APIRequestContext, auth state, schema validation |
+| **Phase 5: DevOps, CI/CD, & Docker** | 45–55 min | GitLab YAML configuration, Dockerfiles | Container tuning, dependency cache, merge locks, security |
+| **Phase 6: Scenario & Closing** | 55–60 min | NFR, CAPTCHA, and Reverse Interviewing | Senior leadership mindset, K6 integration |
 
 ---
 
-## PHASE 1: INTRODUCTION (5-7 min)
+## PHASE 1: INTRODUCTION (5 min)
 
 ### Q1. "Tell me about yourself"
 > "I have 9.6 years of experience in Quality Engineering across multiple domains like HRMS, Retail, CRM, and Energy. Currently, I'm a QE Lead at Infosys, managing a team of 6 engineers.
 > 
-> Alongside our standard QA delivery, my key focus is integrating secure, controlled **AI-augmented agents** into our TypeScript and Playwright framework. We built these localized agents to eliminate highly repetitive scripting tasks—specifically generating resilient locators and performing automated self-healing from logs and trace files—while keeping everything completely secure and compliant using a custom-configured **GitHub Copilot Enterprise** instance approved by our client.
+> My core expertise lies in designing and scaling modular end-to-end automation frameworks using **JavaScript (Node.js)** with **Playwright**. I specialize in moving teams away from legacy systems to high-speed, headless execution models. 
 > 
-> On the management side, I recently solved our account-wide test traceability issues by automating direct mapping between automated test results and JIRA user stories, while customizing workflows for our end-to-end QA tasks. This gives us seamless traceability of QA progress inside a single tool, saving our client significant licensing costs on extra test management tooling."
+> Alongside standard functional UI testing, my primary technical focus is double-edged:
+> 1. **Code-based API Automation:** Implementing deeply integrated API test layers directly in E2E code to bypass Postman, facilitating seamless database seeding, state sharing, and high-performance hybrid testing.
+> 2. **DevOps & Infrastructure:** Building optimized Docker images and configuring complex multi-stage **GitLab CI/CD pipelines** using robust YAML configurations with advanced caching, secret scanning, and parallel test sharding.
 > 
-> **⚡ Why this works:** This is a classic "curiosity loop" strategy. By dropping high-impact terms (secured AI agents, trace self-healing, automated JIRA story mapping, GitHub Copilot Enterprise) and stopping naturally, you leave the interviewer highly curious to ask: *"Wait, how does that secure self-healing actually work?"* or *"How are you mapping Playwright directly to JIRA?"*
+> Most recently, I engineered secure, localized AI-augmented agent tools integrated into our CLI pipeline to parse failing Playwright trace files. This automated self-healing locator generation and error-solution matching, reducing manual script maintenance overhead by **40%**."
 > 
-> > 🔄 **Related Cross-Question:** "How does your self-healing agent interact with GitHub Copilot Enterprise, and how do you ensure security compliance?"
+> **⚡ Strategic Hook:** This elevator pitch immediately hits every single keyword of the Siemens JD (Playwright, JS/Node.js, API via code, GitLab CI/CD, Docker, and DevOps). By pausing here, you invite them to drill down into your actual coding and pipeline architecture rather than generalities.
+> 
+> > 🔄 **Related Cross-Question:** "You mentioned building custom E2E frameworks in Playwright. Why did you choose Playwright over legacy tools like Selenium or other modern tools?"
 > >
-> > **Answer:** "We utilize the GitHub Copilot Enterprise APIs under a corporate subscription with strict data exclusion policies, meaning no proprietary code is ever used for training external models or leaves our secure network. When a test fails, our agent parses the Playwright JSON logs and trace zip files. It sends the failure context along with local codebase indexing to the Copilot Enterprise API, receives a suggested code fix on a secure staging branch, runs an automated headless dry-run on a private CI node, and only opens a PR once the suite compiles and passes successfully."
+> > **Answer:** "I choose **Playwright** because it interacts with the browser via the Chrome DevTools Protocol (CDP) instead of standard HTTP bindings. This provides native multi-tab, multi-origin, and extremely fast headless browser execution. Crucially, it allows high-speed parallel execution across multiple isolated browser contexts—perfect for testing multi-role workflows like an Admin and User running simultaneously. To ensure clean code, I establish strict ESLint rules, enforce static type checking or strict JS standards, utilize base Page Object Models with TypeScript interfaces, and mandate peer reviews with pre-push Git hooks."
 
 ---
 
-## PHASE 2: FRAMEWORK DEEP DIVE (15-18 min)
+## PHASE 2: PLAYWRIGHT UI ARCHITECTURE (10 min)
 
-### Q2. "Explain your framework architecture"
-> "To give you a clear picture, I divide our framework into three core parts: **our Layered Architecture**, **the Dynamic UI challenges** we face, and **our Secured AI/MCP layer** designed to resolve them.
->
-> **1. Layered Architecture:**
-> We built a modular TypeScript framework structured as follows:
-> - **BDD & POM:** BDD feature files define simple-language scenarios, which map directly to a structured Page Object Model (POM) for clean maintenance.
-> - **Utils & Hooks:** Standardized folders managing shared utility methods and browser lifecycle hooks (browser launch, context, cookies, etc.).
-> - **Custom SSO Fixtures:** Crucial for our enterprise security. Since our applications support SSO authentication via QR scanning or physical security tokens like YubiKeys, we engineered custom Playwright fixtures that spin up authenticated sessions using pre-configured local browser profiles.
-> - **Config & .env Layer:** Multi-environment handling (QA, Staging, Prod) using `dotenv` to load credentials and endpoints dynamically. These are loaded into a strongly-typed TypeScript configuration class to ensure fail-fast checking of missing parameters at runtime.
-> - **Test Data Management:** Isolated test data layer utilizing structured JSON schemas and TypeScript mock models. Dynamic data is seeded and torn down in real-time via API calls rather than hardcoding static databases.
-> - **Reporting & CI/CD:** Advanced Cucumber reports enriched with screenshots on failure, JSON logs, and trace zip files, running on every Pull Request.
-> - **MCP + CLI Layer:** Our custom tooling for self-healing, memory orchestration, and guided execution.
->
-> **2. The Dynamic UI Problem:**
-> Our enterprise applications are built on React Material UI (MUI) components. MUI generates highly volatile DOM trees where element IDs are dynamic and change on every build. Historically, maintaining locators for these dynamic components consumed over **40% of our engineering regression maintenance effort**.
->
-> **3. Secured AI/MCP Layer:**
-> To solve this, we integrated localized MCP (Model Context Protocol) agents that understand our POM structures and generate code matching our framework patterns.
-> - **DOM + OCR Locator Strategy:** The agent parses the DOM structure while concurrently using OCR (Optical Character Recognition) to map visual coordinates. It evaluates selectors using a **Locator Rating Strategy** to identify the most static and resilient option.
-> - **Self-Healing & Vector Memory:** When a test fails, the agent analyzes logs and trace files to auto-heal the code. If the problem persists, it enters **Guided Mode**, presenting a detailed report of the root cause, attempted fixes, and proposed code changes for human review. Once a fix is approved, the agent stores the error-solution pattern in a **local memory cache**. If a similar issue occurs in the future, it attempts the proven memory solution first, preventing repeated debugging."
->
-> > 🔄 **Related Cross-Question 1:** "How does your locator rating strategy calculate ratings, and how does your agent's OCR engine run locally without relying on heavy external cloud models?"
+### Q2. "Explain the Playwright architecture. How does it run E2E tests?"
+> "The architectural model of Playwright is designed for modern web apps:
+> - **Playwright** runs **outside** the browser. It uses Node.js to connect to browsers via the standard **Chrome DevTools Protocol (CDP)** for Chromium, and equivalent debug protocols for WebKit and Firefox. 
+> - It controls the browser asynchronously over WebSocket connections, allowing native multi-tab, multi-origin, and extremely fast headless browser execution.
+> - Unlike Selenium which translates HTTP calls to browser actions, Playwright's WebSocket connection stays open, instantly capturing network logs, DOM mutations, and console errors without blocking execution."
+
+```mermaid
+graph TD
+    subgraph Playwright Architecture (Outside Browser)
+        PWRunner[Node.js Runner] -->|WebSocket / CDP| BrowserProcess[Browser Process]
+        BrowserProcess -->|Controls| IsolatedTab1[Isolated Context / Page 1]
+        BrowserProcess -->|Controls| IsolatedTab2[Isolated Context / Page 2]
+    end
+    
+    style Playwright Architecture fill:#f0fbf0,stroke:#2e7d32,stroke-width:2px
+```
+
+> > 🔄 **Related Cross-Question:** "How does Playwright handle multi-domain navigation and managing multiple tabs compared to older architectures?"
 > >
-> > **Answer:** "Our Locator Rating Strategy scores selectors based on stability rules (e.g., native `data-testid` receives a 10/10, standard accessibility `aria-roles` receive an 8/10, while volatile CSS classes or long nested XPaths receive a 2/10). For the OCR component, we use a lightweight, secure local library like Tesseract.js running inside our containerized execution node. This extracts visual text and page coordinates locally, comparing them against the DOM nodes to verify that a button is not only present in the code but visually active and readable on screen."
+> > **Answer:** "Because Playwright interacts externally via CDP rather than injecting scripts into the browser window, it is not bound by the same-origin policy that affects in-browser runners. You can spin up multiple isolated `BrowserContext` instances or open multiple tabs (`context.newPage()`) concurrently in a single test, allowing you to handle backend OAuth redirects seamlessly and test cross-domain workflows without flakiness."
+
+### Q3. "How do you scale Page Object Models (POM) and share utilities in Playwright?"
+> "To prevent code duplication, I implement a strictly layered architecture.
+> - **Base Class:** I construct an abstract or base `PageManager` class that hosts shared utilities like custom wait conditions, click retries, and screenshot logging.
+> - **Component Objects:** Pages are broken down into modular components (e.g. Header, Sidebar, Table) so that UI changes in a navigation bar only require a single fix.
+> - **Fixtures:** In Playwright, I use **Fixtures** to inject page objects directly into tests. This eliminates messy setup steps like `const loginPage = new LoginPage(page)` in every test file."
+
+```typescript
+// Playwright: Scalable Fixture Pattern
+import { test as base } from '@playwright/test';
+import { LoginPage } from './pages/LoginPage';
+
+export const test = base.extend<{ loginPage: LoginPage }>({
+    loginPage: async ({ page }, use) => {
+        const loginPage = new LoginPage(page);
+        await loginPage.navigate();
+        await use(loginPage);
+        await loginPage.teardown();
+    }
+});
+```
+
+> > 🔄 **Related Cross-Question:** "Why are Playwright fixtures considered superior to standard `beforeEach` and `afterEach` hooks for large-scale test suites?"
 > >
-> > 🔄 **Related Cross-Question 2:** "Your application uses QR scanning and physical YubiKeys for SSO login. How do you bypass or automate this in both headed local runs and headless CI/CD pipelines using Playwright fixtures?"
+> > **Answer:** "Playwright fixtures are **lazy-loaded** and **isolated**. A fixture only executes if a test explicitly requests it in its arguments, unlike `beforeEach` which runs globally for all tests in a file regardless of whether they need it. Furthermore, fixtures encapsulate their own teardown code immediately after the `use()` statement. This keeps setup and cleanup logic in a single file/function rather than splitting it across separate hooks, greatly increasing maintainability and preventing context leakage between workers."
+
+### Q4. "How do you handle dynamic UIs, volatile React/MUI selectors, and Shadow DOM elements?"
+> "Dynamic elements (like React Material UI dropdowns and dynamically generated element IDs) will break brittle XPaths. I solve this using three strategies:
+> 1. **Semantic Accessibility Locators:** I prioritize native user-facing locators like `page.getByRole('button', { name: 'Save' })` or `page.getByLabel()`. These rarely change even if the underlying DOM structure does.
+> 2. **Text & Hierarchy Chaining:** Instead of absolute index-based paths, I locate a stable parent container first and then chain down to the child: `page.locator('tr').filter({ hasText: 'Order #102' }).getByRole('button', { name: 'Delete' })`.
+> 3. **Shadow DOM Piercing:** Playwright's locator engines pierce Shadow DOMs natively by default (e.g. `page.locator('custom-element >> input')` works without any extra configuration or flags)."
+
+> > 🔄 **Related Cross-Question:** "What if an element is present in the DOM but is hidden behind a loading spinner or an overlay during page transition? How do you prevent flaky clicks?"
 > >
-> > **Answer:** "Whether running headed locally for debugging or headless in our CI/CD pipeline, we use the exact same unified strategy to bypass physical MFA interactions. We perform a one-time manual authentication on a secure machine to generate the session cookies, localStorage, and security tokens, saving this state into a persistent local browser profile. Our custom login Playwright fixture is configured to launch the browser using `browserType.launchPersistentContext(userDataDir)` pointing to this profile. This starts the browser pre-authenticated in both headed and headless modes, completely bypassing the physical QR/YubiKey layer while keeping our execution identical across all environments."
+> > **Answer:** "I avoid hardcoded waits (`page.waitForTimeout`). I rely on Playwright's native auto-waiting. Playwright's `locator.click()` automatically runs actionability checks (visible, enabled, stable, and not obscured). If an overlay is blocking the element, Playwright will wait until the overlay detaches before attempting the click. If the spinner is exceptionally slow, I might assert the page state using `expect(page.locator('.loading-spinner')).toBeHidden()` to ensure the UI is fully unlocked."
+
+### Q5. "How does your self-healing framework capture failures and auto-heal locators?"
+> "When running tests locally or in reporting mode, my framework hooks into the test runner's lifecycle (e.g., Playwright's `reporter.onStepEnd`). 
+> 
+> If a locator fails to resolve:
+> 1. The custom agent parses the current page's live DOM tree.
+> 2. It compares the broken selector against all elements in the DOM using a **Locator Rating Algorithm** based on accessibility properties, custom attributes (`data-testid`), class names, and text coordinates.
+> 3. If it finds a matching element with a rating above 85% (indicating a layout change but identical semantic function), the CLI generates the correct selector and uses a library like `ts-morph` to parse the Abstract Syntax Tree (AST) of the local test file, patching the locator in place.
+> 4. In CI environments, this operates in 'dry-run' reporting mode to suggest fixes without mutating master code directly."
+
+> > 🔄 **Related Cross-Question:** "If the self-healing tool changes code automatically, how do you prevent it from masking a real bug (e.g., the 'Save' button is actually missing, but the agent selects the 'Cancel' button because it's the closest match)?"
 > >
-> > 🔄 **Related Cross-Question 3:** "How does your self-healing agent's memory matching logic work? How does it recognize that a new error matches a previously resolved issue?"
-> >
-> > **Answer:** "When a test fails, the agent generates a unique **'Error Signature'** consisting of the normalized stack trace, the failing test step name, and the page component's local HTML structure. It checks this signature against our local cache repository. If it finds a match, it immediately applies the previously approved solution (like a specific dynamic locator override). If it is a new error, it triggers **Guided Mode**, outputting the root cause, implemented fixes, and recommended solutions for the engineer. Once the engineer reviews and approves the fix, the new Error Signature and its approved solution are saved into the local memory cache to solve similar failures in the future."
-
-### Q3. "What is the difference between `type`, `interface`, and `abstract class`?"
-> "Simply put:
-> - **`type`** → A strict drop-down menu of choices. I use it for browser selection: `type BrowserChoice = 'chromium' | 'firefox' | 'webkit'`
-> - **`interface`** → A strict checklist with zero logic. I use it to define locator contracts for every page.
-> - **`abstract class`** → A base template with actual reusable code. I use it for my `BasePage` which has generic methods like `clickElement()`, but forces each child page to implement `verifyPageLoaded()`."
->
-> ```typescript
-> type BrowserChoice = 'chromium' | 'firefox' | 'webkit';
-> 
-> interface ILoginPageLocators {
->     readonly usernameInput: string;
->     readonly passwordInput: string;
-> }
-> 
-> abstract class BasePage {
->     async clickElement(selector: string) { /* reusable logic */ }
->     abstract verifyPageLoaded(): Promise<boolean>;
-> }
-> 
-> class LoginPage extends BasePage implements ILoginPageLocators {
->     usernameInput = '#user';
->     passwordInput = '#pass';
->     async verifyPageLoaded() { return true; }
-> }
-> ```
-
-> 🔄 **Related Cross-Question:** "When should you absolutely choose an `interface` over a `type` in TypeScript, and vice versa?"
->
-> **Answer:** "Choose `interface` when you need declaration merging (extending contracts across multiple files) or when defining class shapes via `implements`. Choose `type` for union types (e.g., status flags: `'pass' | 'fail' | 'skip'`), intersections, or mapping complex utility types, as interfaces cannot represent primitive unions."
-
-### Q4. "How does your CLI tool intercept and self-heal?"
-> "During Playwright UI execution, I use `page.on('request')` to capture every HTTP call the browser makes. I extract the method, URL, and JSON payload. `Ajv` validates the live payload against a stored JSON schema. If there's a mismatch, `ts-morph` opens the existing TypeScript test file, traverses the AST, and injects the missing field without breaking any formatting."
->
-> ```typescript
-> await page.route('**/api/orders', async (route) => {
->     const response = await route.fetch();
->     const payload = await response.json();
->     if (!validateSchema(payload, 'orderSchema.json')) {
->         autoHealTypeScriptInterface('IOrder', payload);
->     }
->     await route.continue();
-> });
-> ```
-
-> 🔄 **Related Cross-Question:** "What happens if `Ajv` schema validation fails due to a temporary backend bug rather than an actual intentional schema change? Won't your self-healing tool inject incorrect types?"
->
-> **Answer:** "To prevent false self-healing, the tool operates in two modes: 'Report' and 'Apply'. In the CI pipeline, it only reports failures to block the PR. The self-healing ('Apply') is run locally by developers using a specific `--heal` flag. It also compares the payload change against a registered Git branch change log to ensure the change is intentional before modifying the AST."
-
-### Q5. "How do you run K6 and Playwright in the same repo?"
-> "Since both use JavaScript/TypeScript, I use Node's `child_process.execSync` to trigger K6 from a Playwright `afterAll` hook. I pass the auth token from Playwright's API context directly into K6 as an environment variable."
->
-> ```typescript
-> import { execSync } from 'child_process';
-> 
-> test.afterAll(async ({ request }) => {
->     const token = await AuthController.getBearerToken(request);
->     execSync(`k6 run --env TOKEN=${token} performance-k6/loadTest.js`, {
->         stdio: 'inherit'
->     });
-> });
-> ```
-
-> 🔄 **Related Cross-Question:** "Running K6 via `child_process.execSync` inside Playwright runs synchronously and blocks the Playwright thread. Isn't that an anti-pattern for performance testing?"
->
-> **Answer:** "It is synchronous by design because it is placed in the `afterAll` teardown hook *after* the functional UI tests have finished. If we wanted to run concurrent background load while UI actions are executing, we would use `child_process.spawn` asynchronously, poll the process, and run UI steps in parallel."
-
-### Q6. "How do you handle test data for parallel runs?"
-> "We never use the UI to create test data. We use a generic API client with TypeScript Generics to inject data directly before the test. Each parallel worker gets its own isolated data."
->
-> ```typescript
-> export async function createTestData<T>(endpoint: string, payload: T): Promise<T> {
->     const response = await apiContext.post(endpoint, { data: payload });
->     if(!response.ok()) throw new Error(`Data generation failed: ${response.status()}`);
->     return await response.json() as T;
-> }
-> 
-> const testUser = await createTestData<IUser>('/api/users', mockUserData);
-> ```
-
-> 🔄 **Related Cross-Question:** "If multiple parallel tests need to access a shared global config or static lookup data, how do you prevent race conditions or database locks?"
->
-> **Answer:** "We use a read-only strategy for static lookup data (no test can mutate it). For dynamic shared records (like updating a specific project setting), we assign unique IDs to each parallel worker using Playwright's `process.env.TEST_WORKER_INDEX`. Each worker only mutates records tagged with its specific index (e.g., `user_worker_1`, `user_worker_2`)."
+> > **Answer:** "We enforce strict schema boundaries and human-in-the-loop gates. First, the Locator Rating Algorithm has a high threshold (e.g., minimum 85% similarity, enforcing matching tag types and accessible roles). If the similarity rating is low, it halts and exits. Second, self-healing is **never allowed to commit code directly in CI**. In CI, it only writes a suggested Git diff to a JSON artifact. The developer must review the visual diff in the PR pipeline and manually approve the suggested AST patch, preventing false-positive automatic test passes."
 
 ---
 
-## PHASE 3: JS/TS + PLAYWRIGHT CONCEPTS (15 min)
+## PHASE 3: CORE JAVASCRIPT PROGRAMMING & LOGIC (20 min)
 
-### Q7. "Explain async/await and Promise combinators"
-> "Simply put:
-> - **Promise** → A background task that hasn't finished yet (e.g., an API response).
-> - **async** → A label on a function saying 'this function has background tasks.'
-> - **await** → Pauses the test at that line until the background task finishes."
+### Q6. "Explain the differences between `var`, `let`, and `const`, and show how closures are used in automation."
+> "- **`var`** is function-scoped, hoisted, and permits redeclaration, which leads to flaky global state contamination.
+> - **`let`** is block-scoped, hoisted but placed in the Temporal Dead Zone (TDZ) until declaration, preventing premature access.
+> - **`const`** is block-scoped like `let`, but enforces read-only references (though object properties can still be mutated unless frozen via `Object.freeze`).
 > 
-> | Combinator | One-Liner | Use Case |
-> |---|---|---|
-> | `Promise.all` | All or Nothing | Click button + intercept API response simultaneously |
-> | `Promise.allSettled` | Finish Everything | Teardown: clear cookies, localStorage, sessionStorage |
-> | `Promise.race` | First to Finish | Race: Submit button enables vs Error toast appears |
-> | `Promise.any` | First Success | Any optional field filled → Next button enables |
+> A **closure** is created when a function remembers and accesses its lexical scope even when executed outside that scope. In automation, we use closures to encapsulate state, such as custom retry attempts or localized logger counters, without exposing global counters that could be modified by parallel workers."
 
-> 🔄 **Related Cross-Question:** "If you have a `Promise.all` with three API requests, and one fails, what happens to the other two? Do they get cancelled?"
->
-> **Answer:** "No, Javascript is single-threaded and non-blocking, so the other two network requests are already sent to the network layer and will still complete in the background. However, `Promise.all` immediately rejects with the error of the failed one, ignoring the other two's successful outcomes. If we need to capture all results regardless of failure, we use `Promise.allSettled`."
+```javascript
+// Practical Closure: Encapsulating Test Step Logger Count
+function createTestStepLogger(testName) {
+    let stepCount = 0; // Private state
+    return function(message) {
+        stepCount++;
+        console.log(`[${testName}] Step ${stepCount}: ${message}`);
+    };
+}
 
-### Q8. "What is the difference between `var`, `let`, and `const`?"
-> - **`var`** → Function-scoped, hoisted, can be re-declared. Avoid it.
-> - **`let`** → Block-scoped, hoisted but in Temporal Dead Zone until declaration.
-> - **`const`** → Block-scoped, immutable reference (but object properties CAN be changed).
+const logTest1 = createTestStepLogger("Verify User Login");
+logTest1("Navigate to Portal"); // Output: [Verify User Login] Step 1: Navigate to Portal
+logTest1("Input Credentials");  // Output: [Verify User Login] Step 2: Input Credentials
+```
 
-> 🔄 **Related Cross-Question:** "If you declare a `const obj = { name: 'Siemens' }`, can you change `obj.name = 'Infosys'`? What if you want to make the object *truly* immutable?"
->
-> **Answer:** "Yes, you can modify `obj.name` because `const` only guarantees that the *reference* to the object variable cannot be reassigned. To make the object itself truly immutable (preventing property modification), we must use `Object.freeze(obj)` or TypeScript's `as const` read-only modifier."
+> > 🔄 **Related Cross-Question:** "If you have a loop running E2E dynamic test data assertions asynchronously using `var` inside a `setTimeout`, what happens to the printed index? How does `let` resolve this?"
+> >
+> > **Answer:** "If you use `var i = 0` in a `for` loop containing an asynchronous operation like a `setTimeout`, the printed value will be the final value of the loop (e.g. `3, 3, 3`) because `var` is function-scoped and has a single shared binding across all iterations. When the asynchronous callbacks execute, they all reference the same final value of `i`. Using `let` block-scopes the variable, creating a new lexical binding for `i` in **every single iteration** of the loop, resulting in the correct execution (e.g. `0, 1, 2`)."
 
-### Q9. "Why Playwright over Selenium?"
-> - **Auto-waiting:** Playwright auto-waits for elements. No `Thread.sleep()`.
-> - **BrowserContext isolation:** Each test gets its own browser context (cookies, storage). No cross-test leakage.
-> - **Built-in API testing:** `request` context lets us do API calls without a separate tool.
-> - **Parallel by default:** Multi-worker parallelism out of the box.
-> - **Cross-browser:** Chromium, Firefox, WebKit in one config.
+### Q7. "What is the difference between `type`, `interface`, and `abstract class` in TypeScript?"
+> "When building a highly structured, scalable testing framework:
+> - **`interface`** defines a strict contract or shape for an object (e.g., page element contracts). It supports **declaration merging** (extending interfaces across multiple imports) and is strictly compiled out of the final JS code.
+> - **`type`** is used for union types, intersections, or primitives. I use it for environment configurations or browser choices where values are bounded: `type Environment = 'QA' | 'Staging' | 'Prod'`.
+> - **`abstract class`** is a runtime blueprint that can contain concrete, reusable code (e.g., a fully coded `clickElement()` method) while forcing child pages to implement specific abstract methods (e.g., `verifyPageLoaded()`). It remains in the compiled JS output."
 
-> 🔄 **Related Cross-Question:** "Selenium supports a wider range of legacy browsers (like old Safari or IE) and has massive community support. How do you address these gaps when pitch-selling Playwright?"
->
-> **Answer:** "Siemens projects primarily target modern enterprise web apps where 99% of customers use Chromium, Firefox, or Safari (WebKit). Playwright supports all three out-of-the-box. For legacy support, the gain in test speed, zero flakiness, and integrated API mocking far outweighs the cost of testing niche legacy browsers, which can be covered by a minimal manual checklist or a single Selenium grid node."
+```typescript
+// Example Implementation
+type EnvChoice = 'QA' | 'UAT';
 
-### Q10. "Explain Browser vs BrowserContext vs Page"
-> - **Browser** → The entire browser instance (like opening Chrome).
-> - **BrowserContext** → An isolated session inside the browser (like an incognito tab). Each context has its own cookies, storage, and cache.
-> - **Page** → A single tab within a context. Multiple pages can exist in one context.
+interface ILoginPage {
+    readonly usernameInput: string;
+    readonly passwordInput: string;
+}
 
-> 🔄 **Related Cross-Question:** "How do you use `BrowserContext` to simulate multi-role user workflows (like an Admin approving a request made by a Requester) within a single test?"
->
-> **Answer:** "I create two separate BrowserContexts in the same test using `await browser.newContext()`. `contextAdmin` and `contextUser` are completely isolated. I open a page in each, perform the request as the user, and then verify and approve it on the admin page, all running concurrently without session leakage."
+abstract class BasePOM {
+    constructor(protected page: any) {}
+    async click(selector: string) { await this.page.click(selector); }
+    abstract load(): Promise<void>; // Contract to implement
+}
+```
 
-### Q11. "How do you handle network interception / API mocking?"
-> "I use `page.route()` to intercept any network request and mock it. This is critical when the backend is unstable or when testing error states."
+> > 🔄 **Related Cross-Question:** "If interfaces are compiled out and do not exist at runtime, how do you handle dynamic schema validations at runtime using TypeScript?"
+> >
+> > **Answer:** "Because TypeScript types and interfaces are purely design-time metadata, we cannot use them for runtime validation of live API payloads or dynamic JSON config files. To solve this, we must use a runtime schema validation library like **Ajv** or **Joi** that executes validation using raw JS objects, while generating corresponding TypeScript types from the schema definitions using utility helpers like `schema-to-ts` to preserve static safety."
+
+### Q8. "How does the JavaScript Event Loop work? Explain Microtasks vs Macrotasks."
+> "JavaScript is single-threaded and non-blocking. It achieves concurrency using the **Event Loop**.
+> 1. **Call Stack:** Executes synchronous code sequentially.
+> 2. **Web APIs:** Offloads asynchronous tasks (HTTP requests, DOM events, timeouts).
+> 3. **Microtask Queue:** Holds callbacks from resolved **Promises**, `process.nextTick`, and MutationObservers.
+> 4. **Macrotask (Callback) Queue:** Holds callbacks from `setTimeout`, `setInterval`, and I/O operations.
 > 
-> ```typescript
-> await page.route('**/api/orders', route => {
->     route.fulfill({
->         status: 200,
->         body: JSON.stringify({ status: 'success', orderId: 'MOCK_123' })
->     });
-> });
-> ```
+> The Event Loop constantly monitors the Call Stack. Once the Call Stack is empty, it processes **all** microtasks in the Microtask Queue *before* processing the next single macrotask from the Macrotask Queue."
 
-> 🔄 **Related Cross-Question:** "If you mock all your API responses, aren't you just testing a fake application? How do you ensure the mock data matches the real production backend?"
->
-> **Answer:** "We only mock for fast UI-only testing, unstable third-party payment gateways, or simulating rare server errors (500, 503). To ensure our mock data never drifts from production, our AI CLI CLI matches the mocked JSON responses against the live OpenAPI (Swagger) spec files during our daily regression runs. Any mismatch triggers a schema drift alert."
+```javascript
+console.log('1'); // Call Stack (Sync)
 
-### Q12. "How do you handle flaky tests?"
-> 1. **Stable locators:** `getByRole()`, `getByTestId()` — never fragile XPath.
-> 2. **Auto-waiting:** Rely on Playwright's built-in auto-wait, never `waitForTimeout()`.
-> 3. **API setup:** Create test data via API instead of UI to reduce failure points.
-> 4. **Retry is a safety net, not a fix:** `retries: 2` in config catches CI network blips, but the root cause must always be fixed.
+setTimeout(() => console.log('2'), 0); // Macrotask Queue
 
-> 🔄 **Related Cross-Question:** "You mentioned avoiding `waitForTimeout()`. What if you are waiting for an element that animates or fades in, and standard auto-wait clicks it too early?"
->
-> **Answer:** "Playwright's `locator.click()` automatically waits for the element to be visible, enabled, and *stable* (not moving). If an animation is slow, we use `.waitFor({ state: 'attached' })` or explicitly wait for custom CSS transitions to complete using page state assertions like `expect(locator).toHaveClass(/active/)`."
+Promise.resolve().then(() => console.log('3')); // Microtask Queue
 
-### Q13. "What are Playwright Fixtures?"
-> "Fixtures are Playwright's Dependency Injection mechanism. Instead of repeating `beforeEach` setup in every test, I extend Playwright's `test` object with custom fixtures that provide pre-configured page objects directly to the test."
+console.log('4'); // Call Stack (Sync)
+
+// Execution Order: 1 -> 4 -> 3 -> 2
+```
+
+> > 🔄 **Related Cross-Question:** "If you have a complex UI test that generates an infinite loop or performs heavy CPU computation synchronously inside a custom step, what happens to your Playwright E2E runner?"
+> >
+> > **Answer:** "Since JavaScript runs on a single main thread, blocking the event loop with a heavy synchronous calculation or an infinite loop will completely freeze the Call Stack. The E2E runner will be unable to process Web Socket events, browser state updates, or network interception callbacks. This will freeze the browser context and eventually cause the test runner to crash with a severe timeout error. Heavy computations must be offloaded to a worker thread using Node.js `worker_threads` or handled asynchronously in batches."
+
+### Q9. "Coding Challenge 1: Write a custom asynchronous retry mechanism in pure JavaScript."
+> "This utility retries a failing function (like verifying a locator state) `maxRetries` times with a progressive delay before finally throwing an error. It demonstrates deep knowledge of Promises, async/await, and recursion."
+
+```javascript
+/**
+ * Retries an asynchronous test action with delay
+ * @param {Function} action - Async function containing the locator action/assertion
+ * @param {number} maxRetries - Maximum retry limit
+ * @param {number} delayMs - Base wait duration in milliseconds
+ * @returns {Promise<any>}
+ */
+async function retryAction(action, maxRetries = 3, delayMs = 1000) {
+    try {
+        return await action();
+    } catch (error) {
+        if (maxRetries <= 1) {
+            throw new Error(`[Retry Failed] Reached maximum retry limit. Original error: ${error.message}`);
+        }
+        console.warn(`[Retry Warning] Action failed. Retries remaining: ${maxRetries - 1}. Retrying in ${delayMs}ms...`);
+        
+        // Wait helper using Promise
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+        
+        // Progressive backoff: double the delay for next retry
+        return retryAction(action, maxRetries - 1, delayMs * 2);
+    }
+}
+
+// Example Usage in test:
+// await retryAction(async () => {
+//     const text = await page.locator('.status-badge').textContent();
+//     if (text !== 'Completed') throw new Error('Status not ready');
+// }, 4, 500);
+```
+
+> > 🔄 **Related Cross-Question:** "What is the danger of placing a generic `retryAction` function globally around all UI operations instead of leveraging Playwright's native locator assertions (`expect(locator).toBeVisible()`)?"
+> >
+> > **Answer:** "Using a custom recursive retry loop around generic UI actions can interfere with Playwright's built-in **web-first assertions**. Playwright's native assertions automatically retry checking the DOM state under the hood for a configured timeout (e.g. 5 seconds) at a highly optimized, non-blocking frequency. Wrapping them in a custom `retryAction` with a hard `setTimeout` introduces arbitrary sleep delays, artificially inflating test execution times and making scripts sluggish. Custom retries should be reserved for flaky network APIs or non-standard hardware integration polling."
+
+### Q10. "Coding Challenge 2: Parse a nested API response and calculate total spending using `map`, `filter`, and `reduce`."
+> "This coding challenge parses a nested raw JSON response to extract, filter, and aggregate total order spending for users belonging to a specific department. It tests clean array manipulation."
+
+```javascript
+const rawApiResponse = {
+    status: "success",
+    data: {
+        users: [
+            { id: 1, name: "Alice", department: "Engineering", orders: [{ id: "A1", amount: 150 }, { id: "A2", amount: 350 }] },
+            { id: 2, name: "Bob", department: "HR", orders: [{ id: "B1", amount: 120 }] },
+            { id: 3, name: "Charlie", department: "Engineering", orders: [{ id: "C1", amount: 500 }] },
+            { id: 4, name: "David", department: "Sales", orders: [] }
+        ]
+    }
+};
+
+/**
+ * Calculates total order spend for a target department
+ * @param {Object} response - Nested API response object
+ * @param {string} targetDept - Department name to filter by
+ * @returns {number} - Aggregated spending sum
+ */
+function calculateDeptSpend(response, targetDept) {
+    if (!response || !response.data || !Array.isArray(response.data.users)) {
+        return 0;
+    }
+
+    return response.data.users
+        // Step 1: Filter users by target department
+        .filter(user => user.department === targetDept)
+        // Step 2: Map to flatten dynamic orders arrays into a single list of amounts
+        .map(user => user.orders ? user.orders.map(order => order.amount) : [])
+        // Flattening the nested arrays of amounts
+        .reduce((flatList, currentList) => flatList.concat(currentList), [])
+        // Step 3: Reduce to aggregate the total sum
+        .reduce((totalSum, currentAmount) => totalSum + currentAmount, 0);
+}
+
+const totalSpent = calculateDeptSpend(rawApiResponse, "Engineering");
+console.log(`Total Engineering Spend: $${totalSpent}`); // Output: $1000 ($150 + $350 + $500)
+```
+
+> > 🔄 **Related Cross-Question:** "How would you rewrite this function to prevent runtime errors if some user records in the API payload are completely missing the `orders` field or if the array is null?"
+> >
+> > **Answer:** "I make the code highly resilient using **Optional Chaining (`?.`)** and **Nullish Coalescing (`??`)** operators. Instead of checking nested properties with complex if statements, we can write `user.orders?.map(o => o.amount) ?? []`. This ensures that if `orders` is undefined or null, it falls back to an empty array gracefully, preventing uncaught runtime type errors from breaking the automation pipeline."
+
+### Q11. "Explain async/await and Promise combinators. Write a code snippet showing where `Promise.all` optimizes E2E testing."
+> "Async/await is syntactic sugar over Promises, making asynchronous code read synchronously.
 > 
-> ```typescript
-> import { test as base } from '@playwright/test';
+> Promise combinators manage multiple async tasks:
+> - **`Promise.all`:** Runs all tasks concurrently. Fails immediately if **any** promise rejects (all-or-nothing).
+> - **`Promise.allSettled`:** Runs all tasks concurrently. Returns results for all promises regardless of success or failure. Excellent for tear-downs.
+> - **`Promise.race`:** Resolves or rejects as soon as the **first** promise completes.
+> - **`Promise.any`:** Resolves as soon as the first **successful** promise resolves.
 > 
-> export const test = base.extend<{ loginPage: LoginPage }>({
->     loginPage: async ({ page }, use) => {
->         const loginPage = new LoginPage(page);
->         await use(loginPage);
->     }
-> });
-> 
-> // Usage: test function directly receives loginPage
-> test('login test', async ({ loginPage }) => {
->     await loginPage.login('admin', 'pass');
-> });
-> ```
+> We use `Promise.all` in E2E testing to trigger UI click events while simultaneously listening for the network response, preventing race conditions where the response returns before the listener is registered."
 
-> 🔄 **Related Cross-Question:** "How is a Playwright Fixture different from a standard `beforeEach` hook in terms of execution order and teardown?"
->
-> **Answer:** "A fixture is lazy-loaded (it only runs if a test explicitly requests it in its arguments), whereas `beforeEach` runs for *every* test in the file. Additionally, fixtures handle teardown natively: code *before* the `use()` statement acts as setup, and code *after* `use()` acts as teardown, keeping setup/cleanup logic in one place instead of splitting it into `beforeEach` and `afterEach`."
+```typescript
+// Playwright: Synchronous click and network intercept optimization
+const [response] = await Promise.all([
+    // Step 1: Set up the network wait first
+    page.waitForResponse(response => 
+        response.url().includes('/api/orders/create') && response.status() === 201
+    ),
+    // Step 2: Trigger the click action that fires the request
+    page.locator('[data-testid="submit-btn"]').click()
+]);
+
+const responseBody = await response.json();
+console.log(`Created Order ID: ${responseBody.orderId}`);
+```
+
+> > 🔄 **Related Cross-Question:** "If the `.click()` action in your `Promise.all` fails immediately (e.g., button is disabled), does the `waitForResponse` listener still hang? How do you prevent pipeline timeouts?"
+> >
+> > **Answer:** "Yes, if the click fails, the `waitForResponse` promise will remain pending and will hang until the global test timeout is reached, consuming valuable CI minutes. To prevent this, we should pass an explicit timeout option to our network wait action inside the `Promise.all` structure, like `page.waitForResponse(..., { timeout: 5000 })`. This ensures that even if the UI click fails, the network listener will actively abort and fail the test quickly rather than hanging."
+
+### Q12. "How do you handle deep vs. shallow copies in JS, and why is this critical in test data management?"
+> "In JavaScript, objects and arrays are assigned by reference.
+> - **Shallow Copy:** Copies only the first-level references (e.g., using Object spread `const newObj = { ...oldObj }` or `Object.assign()`). If the object contains nested objects, modifying a nested property in the copy will directly mutate the original object.
+> - **Deep Copy:** Recursively copies all levels, isolating the new object completely.
+> 
+> This is critical in test data management. If we have a base JSON data template for creating users, and parallel workers perform shallow copies to modify user names, they will overwrite each other's nested address structures, causing dynamic test crosstalk and unpredictable validation failures."
+
+```javascript
+const baseUserTemplate = {
+    role: "Admin",
+    details: { city: "Munich", status: "Active" }
+};
+
+// Shallow Copy Mutation Danger
+const worker1 = { ...baseUserTemplate };
+worker1.details.city = "Bangalore";
+
+console.log(baseUserTemplate.details.city); // Prints "Bangalore"! (Original was mutated)
+
+// Deep Copy Resolution
+const worker2 = globalThis.structuredClone(baseUserTemplate);
+worker2.details.city = "Erlangen";
+
+console.log(baseUserTemplate.details.city); // Prints "Bangalore" (Safe, original unchanged)
+```
+
+> > 🔄 **Related Cross-Question:** "What are the different ways to achieve a deep copy in Node.js, and which one is the modern standard?"
+> >
+> > **Answer:** "Historically, developers used `JSON.parse(JSON.stringify(obj))`, which is slow and drops functions, dates, or regex patterns. In modern Node.js (v17+), the built-in **`structuredClone(obj)`** is the absolute standard. It runs natively in V8, preserves dates, regex, maps, sets, and handles circular references flawlessly."
 
 ---
 
-## PHASE 4: API AUTOMATION (10 min)
+## PHASE 4: DEEP API AUTOMATION VIA CODE (10 min)
 
-### Q14. "How do you do API testing through code (not Postman)?"
-> "I use Playwright's built-in `APIRequestContext`. It's our Rest Assured equivalent in the Node.js world."
+### Q13. "Why is API test automation through code superior to Postman/Newman?"
+> "While Postman is great for exploratory manual testing, code-based API testing using native frameworks (like Playwright APIRequestContext) is far superior for five reasons:
+> 1. **Zero Context Switching:** Both UI and API automation live in the same repository, written in the same language (JavaScript), and execute in the same pipeline.
+> 2. **State Sharing:** We can trigger an API call to seed a user, retrieve the session cookie, and inject it directly into the browser context. The UI test starts fully authenticated, bypassing slow UI login steps.
+> 3. **Perfect Version Control:** Scripts are standard code files. They are reviewed, branch-tracked, and merged using standard Git workflows, avoiding Postman collection import/export conflicts.
+> 4. **No Licensing Overhead:** Running massive collections via Newman requires external licensing and specialized CLI runners. Playwright handles this natively out of the box with zero dependencies.
+> 5. **Programmatic Data Generation:** We can leverage standard JS libraries (e.g., `faker` or mock modules) to generate dynamic payloads in real-time, which is cumbersome in Postman pre-request scripts."
+
+```
++---------------------------------------------------------+
+|                  Postman vs. Code APIs                  |
++--------------------------+------------------------------+
+| Feature                  | Code-Based (Playwright)      | Postman/Newman
++--------------------------+------------------------------+
+| Execution context        | Same thread as UI tests      | Isolated sandbox
+| Shared storage           | Direct runtime objects       | File exports/Env JSON
+| Git Version Control      | Seamless PR code diff        | JSON Collection merges |
+| CI Pipeline Integration  | Single npm command           | Separate Newman setup  |
++--------------------------+------------------------------+
+```
+
+> > 🔄 **Related Cross-Question:** "If the backend uses modern webhooks or Event-Driven architectures (like Kafka or WebSockets), can Postman handle E2E validation? How would you solve this in code?"
+> >
+> > **Answer:** "Postman struggles with long-running, asynchronous, event-driven webhooks. In code-based frameworks, we can easily spin up a temporary express server or register a WebSocket listener directly inside our Node.js test process. Our test can execute a UI action, wait for the event to hit our container's web port, and validate the async payload programmatically within a strict timeout, enabling true end-to-end integration testing."
+
+### Q14. "How do you handle API mocking and network interception in Playwright?"
+> "I use `page.route()` to intercept network requests directly from the browser layer. This allows us to mock backend responses when an API is unstable, test edge-case error states, or block heavy resources like images to speed up test execution."
+
+```typescript
+await page.route('**/api/orders', async route => {
+    // Fulfill with a mocked JSON payload to test frontend rendering
+    await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ status: 'success', orderId: 'MOCK_123' })
+    });
+});
+```
+
+> > 🔄 **Related Cross-Question:** "If you mock all your API responses, aren't you just testing a fake application? How do you ensure the mock data matches the real production backend?"
+> >
+> > **Answer:** "We only mock for fast UI-only component testing, unstable third-party payment gateways, or simulating rare server errors (like a 500 or 503). To ensure our mock data never drifts from production, our CI pipeline runs schema validation tasks that check our mocked JSON responses against the live OpenAPI (Swagger) spec files during daily regressions. Any mismatch triggers a schema drift alert."
+
+### Q15. "Write a complete Playwright code snippet for a chained API test flow."
+> "This shows a chained API flow in Playwright, leveraging Node.js `async/await` and TypeScript interfaces for robust type safety."
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+interface AuthResponse {
+    access_token: string;
+    expires_in: number;
+}
+
+interface ProfileUpdateResponse {
+    updated: boolean;
+    profile: { name: string; notificationsEnabled: boolean };
+}
+
+test.describe('Playwright Programmatic API Chaining', () => {
+    const apiBaseUrl = 'https://api.siemens-portal.local';
+
+    test('should authenticate and execute profile update transaction', async ({ request }) => {
+        // Step 1: Login and extract access token
+        const authResponse = await request.post(`${apiBaseUrl}/api/v1/auth/login`, {
+            data: {
+                client_id: 'siemens_sdet_client',
+                secret_key: 'supersecretkey'
+            },
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        expect(authResponse.ok()).toBeTruthy();
+        const authData = await authResponse.json() as AuthResponse;
+        const token = authData.access_token;
+        
+        // Step 2: Use token to execute the profile update
+        const profileResponse = await request.put(`${apiBaseUrl}/api/v1/users/profile`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            data: {
+                displayName: "Sourabh Lead SDET",
+                notificationsEnabled: true
+            }
+        });
+
+        expect(profileResponse.ok()).toBeTruthy();
+        const profileData = await profileResponse.json() as ProfileUpdateResponse;
+        
+        // Assertions
+        expect(profileData.updated).toBe(true);
+        expect(profileData.profile.name).toBe("Sourabh Lead SDET");
+    });
+});
+```
+
+> > 🔄 **Related Cross-Question:** "What happens to the `request` context if the server returns a 500 error? Does Playwright automatically throw an exception, or do you have to handle it manually?"
+> >
+> > **Answer:** "By default, Playwright's `APIRequestContext` methods (like `.post()` or `.put()`) **do not throw an error** if the server returns a non-2xx status code. They return a standard response object containing the status code. It is our responsibility to manually assert `expect(response.ok()).toBeTruthy()`. However, we can configure this globally in `playwright.config.ts` if we want our tests to fail immediately on any non-success responses."
+
+### Q16. "How do you handle user authentication state to avoid repeating login flows across hundreds of tests?"
+> "Repeating UI login pages before every single test is an anti-pattern that bloats execution times. In Playwright, I handle state injection natively using **`storageState`**.
 > 
-> ```typescript
-> const response = await request.post('/api/users', {
->     data: { name: 'Sourabh', role: 'Admin' }
-> });
-> expect(response.status()).toBe(201);
-> const body = await response.json();
-> expect(body.name).toBe('Sourabh');
-> ```
+> In a global setup or a dedicated setup project, I perform a single UI or API login, retrieve the cookies and localStorage state, and write them to a JSON file (`auth_state.json`). In my main config, I assign `storageState: 'auth_state.json'`. Every worker starts fully authenticated."
 
-> 🔄 **Related Cross-Question:** "How do you validate large, complex JSON payloads without writing hundreds of individual assertions?"
->
-> **Answer:** "I use JSON Schema Validation. Instead of asserting every field, I validate the entire response against a predefined JSON schema using `Ajv`. This validates all types, required fields, and nested structures in a single assertion: `expect(ajv.validate(schema, responseBody)).toBe(true)`."
+```typescript
+// Playwright Config: Global Storage Injection
+import { defineConfig } from '@playwright/test';
 
-### Q15. "How do you handle token-based authentication?"
-> "I extract the token from the login API response and pass it as a header in all subsequent requests."
+export default defineConfig({
+    use: {
+        baseURL: 'https://portal.siemens-portal.local',
+        storageState: 'playwright/.auth/user.json', // Authenticated state injected everywhere
+    },
+});
+```
+
+> > 🔄 **Related Cross-Question:** "What happens if a specific test in your suite represents an 'Unauthorized User' or a 'Logged Out' flow? How do you bypass the global `storageState` configuration?"
+> >
+> > **Answer:** "For tests that require an unauthenticated or public-facing browser session, we can explicitly override the global configuration by requesting an empty storage state directly inside the test block: `test.use({ storageState: { cookies: [], origins: [] } })`. This keeps the context isolated and clean for that specific test."
+
+### Q17. "How do you validate large, complex JSON payloads programmatically without writing hundreds of individual assertions?"
+> "Asserting hundreds of dynamic properties manually (e.g. `expect(body.user.address.zip).toBe('80333')`) is highly fragile and inefficient.
 > 
-> ```typescript
-> const login = await request.post('/api/login', {
->     data: { username: 'admin', password: 'admin123' }
-> });
-> const token = (await login.json()).token;
-> 
-> // Use token in subsequent API calls
-> const res = await request.get('/api/orders', {
->     headers: { 'Authorization': `Bearer ${token}` }
-> });
-> ```
+> I implement **JSON Schema Validation** using **Ajv (Another JSON Schema Validator)** for Node.js. 
+> 1. We define a JSON schema representing the expected properties, data types, and required fields.
+> 2. We compile the schema once.
+> 3. We assert the entire response payload against the schema in a single assertion. This instantly catches contract drifts, missing fields, or incorrect types."
 
-> 🔄 **Related Cross-Question:** "How do you avoid authenticating and fetching a new token before *every* single test, which slows down execution?"
->
-> **Answer:** "We use Playwright's `storageState`. In our global setup, we authenticate once, save the cookies and localStorage state to a JSON file (`state.json`), and configure our playwright config to inject this storage state into all tests. This completely skips the login steps for all subsequent tests."
+```javascript
+import Ajv from 'ajv';
+import { test, expect } from '@playwright/test';
 
-### Q16. "Combine API and UI in one test — what are the risks?"
-> "A lot of people use API to create data to save time. But the risk is: **if the UI form is broken and not sending correct data to the backend, you'll never catch it because you bypassed the UI.**
-> 
-> I divide Hybrid testing into two strategies:
-> - **Strategy 1 (Smoke):** UI Action → Intercept API response → Verify payload. Proves frontend is working.
-> - **Strategy 2 (Regression CI):** API creates data → UI verifies rendering. Fast, but only used after Smoke has already proven the UI."
+const ajv = new Ajv({ allErrors: true });
 
-> 🔄 **Related Cross-Question:** "If an API endpoint changes, both your API tests and your hybrid UI tests will fail at the same time. How do you isolate the root cause quickly?"
->
-> **Answer:** "We structure our CI pipeline to run pure API tests in an early stage *before* the UI/Hybrid tests. If the API stage fails, the pipeline halts immediately. This ensures that when the UI stage runs, we are 100% confident the backend contract is stable, pointing any failures in the UI stage strictly to frontend defects."
+// Expected JSON Schema
+const userProfileSchema = {
+    type: "object",
+    properties: {
+        updated: { type: "boolean" },
+        profile: {
+            type: "object",
+            properties: {
+                name: { type: "string" },
+                notificationsEnabled: { type: "boolean" }
+            },
+            required: ["name", "notificationsEnabled"]
+        }
+    },
+    required: ["updated", "profile"]
+};
 
-### Q17. "How do you handle chained API calls?"
-> "Create a user first, extract the `userId` from the response, then use it in the next call. If the first API fails, the chain fails immediately — which is the correct behavior."
-> 
-> ```typescript
-> const user = await request.post('/api/users', { data: { name: 'Test' } });
-> const userId = (await user.json()).id;
-> const orders = await request.get(`/api/users/${userId}/orders`);
-> expect(orders.ok()).toBeTruthy();
-> ```
+test('Validate user profile API against Schema', async ({ request }) => {
+    const response = await request.get('/api/v1/profile/1');
+    const body = await response.json();
 
-> 🔄 **Related Cross-Question:** "What is the best way to handle error recovery if the middle request in a 5-step API chain fails?"
->
-> **Answer:** "Since API chains are designed to represent a transactional business flow, if step 3 fails, we catch the error, log the exact request/response payload, and immediately trigger a cleanup script using an `afterAll` hook or a `try-finally` block to delete any partial data created in steps 1 and 2 to keep the database clean."
+    // Compile and validate
+    const validate = ajv.compile(userProfileSchema);
+    const valid = validate(body);
+
+    if (!valid) {
+        console.error('Schema Validation Errors:', ajv.errorsText(validate.errors));
+    }
+    
+    expect(valid).toBe(true);
+});
+```
+
+> > 🔄 **Related Cross-Question:** "What is the danger of maintaining these static schema files manually as APIs evolve over time? How do you prevent schema drift?"
+> >
+> > **Answer:** "Manual schemas can drift and cause false failures. To prevent this, we integrate our framework directly with our backend development OpenAPI/Swagger schemas. We set up an automated CI task that fetches the live swagger JSON file from the backend development server and generates corresponding JSON schemas dynamically, or we use tools like `jest-openapi` to assert that our E2E payloads strictly match the active live production OpenAPI specification."
 
 ---
 
-## PHASE 5: CI/CD + DOCKER + STRATEGY (8 min)
+## PHASE 5: DEVOPS, DOCKER, GITLAB CI/CD, & YAML (10 min)
 
-### Q18. "Explain your CI/CD pipeline stages"
-> "1. **Build** → `npm ci`, `docker build`
-> 2. **Lint** → `eslint`, SonarQube
-> 3. **Unit Tests** → Jest/Mocha
-> 4. **Deploy to QA** → Deploy artifact to staging
-> 5. **E2E Automation (Playwright)** → Smoke + Regression against live QA
-> 6. **Performance (K6)** → Load testing with thresholds
-> 7. **Deploy to Prod** → Manual approval gate
-> 
-> If E2E or K6 fails, the pipeline halts immediately."
+### Q18. "Provide a production-grade, optimized `.gitlab-ci.yml` file for running E2E tests."
+> "This highly robust GitLab CI config utilizes best practices: it extends jobs using **anchors (`extends`)**, implements secure global variables, optimizes dependency **caching**, and runs test **sharding/parallelization** dynamically."
 
-> 🔄 **Related Cross-Question:** "If your pipeline fails at the E2E stage on CI, how do you debug it without having access to the CI server console?"
->
-> **Answer:** "We configure Playwright to automatically capture screenshots, video recordings, and full trace zip files *only on failure* (`trace: 'retain-on-failure'`). These are published as GitLab/Azure DevOps artifacts. I download the trace zip and open it locally via `npx playwright show-trace trace.zip`, which lets me inspect network calls, console logs, and action timings frame-by-frame."
+```yaml
+stages:
+  - install
+  - test
+  - publish
 
-### Q19. "Write a basic GitLab CI YAML for Playwright"
-> ```yaml
-> stages:
->   - test
-> 
-> playwright-test:
->   stage: test
->   image: mcr.microsoft.com/playwright:v1.40.0-jammy
->   script:
->     - npm ci
->     - npx playwright test
->   artifacts:
->     when: always
->     paths:
->       - playwright-report/
-> ```
+# Global caching template to prevent repeating npm install
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - .npm/
+    - node_modules/
 
-> 🔄 **Related Cross-Question:** "Why did you use `image: mcr.microsoft.com/playwright:v1.40.0-jammy`? Why is the OS version (jammy) important?"
->
-> **Answer:** "Playwright binds tightly to specific browser engine binaries. Using the official image with a matching version ensures that the browser versions running inside Docker are identical to the local Playwright npm package version, preventing unexpected rendering mismatches. `jammy` (Ubuntu 22.04) provides a stable Linux environment with all required multimedia libraries preinstalled."
+variables:
+  PLAYWRIGHT_VERSION: "1.40.0"
+  CI_DEBUG_TRACE: "false"
 
-### Q20. "Why Docker for Playwright?"
-> "Docker eliminates 'It works on my machine' issues. The Microsoft Playwright Docker image comes pre-installed with all browser binaries (Chromium, Firefox, WebKit) and their OS-level dependencies. My test runs identically on my laptop and on the CI server."
+# Reusable Job Base Anchor
+.test-base:
+  image: mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}-jammy
+  before_script:
+    - npm ci --cache .npm --prefer-offline
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - playwright-report/
+      - test-results/
 
-> 🔄 **Related Cross-Question:** "Docker container execution is often slower than native run due to shared resource overhead. How do you optimize Docker CPU/Memory limits for Playwright execution?"
->
-> **Answer:** "We configure the runner to utilize shm (Shared Memory) size of at least `2gb` (`--shm-size=2gb`) because Chromium utilizes shared memory for rendering, and the default Docker shm size (64mb) causes browsers to crash. We also scale Playwright's parallel worker count (`workers: '50%'`) to prevent CPU throttling on resource-constrained agent machines."
+# Install Stage: Prepare the execution workspace
+install-dependencies:
+  stage: install
+  image: node:20-bookworm
+  script:
+    - npm ci --cache .npm --prefer-offline
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
 
-### Q21. "How do you embed shift-left quality gates?"
-> "1. **Pre-commit hooks (Husky):** Linting + unit tests before code can even be pushed.
-> 2. **PR quality gates:** Playwright smoke tests run on every Pull Request. PR cannot merge unless tests pass.
-> 3. **JIRA dashboards:** Automated reporting with pass/fail metrics for risk-based Go/No-Go decisions."
+# Test Stage: Multi-Worker Dynamic Sharding (Parallel Matrix)
+run-e2e-tests:
+  stage: test
+  extends: .test-base
+  parallel:
+    matrix:
+      - SHARD: ["1/3", "2/3", "3/3"]
+  script:
+    - npx playwright test --shard=${SHARD}
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
-> 🔄 **Related Cross-Question:** "Developers often complain that running tests on every PR slows down their feedback loop. How do you keep developers happy while maintaining quality gates?"
->
-> **Answer:** "We do not run the full E2E suite on PRs. We run an optimized 'PR-Smoke' suite containing only critical happy-path tests (taking under 3 minutes). The full regression suite runs nightly. Additionally, we use Playwright's dependency tracing to run only tests affected by the changed source code files."
+# Publish Stage: Combine dynamic E2E reports
+publish-results:
+  stage: publish
+  image: node:20-bookworm
+  script:
+    - echo "All pipeline shards successfully completed and aggregated."
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+```
 
-### Q22. "How do you handle security in CI/CD?"
-> "- **Secret scanning:** GitLab's native secret detection prevents hardcoded passwords.
-> - **Dependency audit:** `npm audit` and Snyk fail the pipeline if HIGH vulnerabilities exist.
-> - **Token management:** We inject tokens via CI/CD Masked Variables (`process.env.API_TOKEN`). They never appear in Git, console, or reports."
+> > 🔄 **Related Cross-Question:** "Why did you use `npm ci` instead of `npm install` inside your CI environment, and what is the significance of caching `.npm` rather than only `node_modules`?"
+> >
+> > **Answer:** "`npm install` can dynamically update dependencies based on semver ranges (like `^` or `~`), modifying the lockfile and generating a non-deterministic build in CI. `npm ci` (Clean Install) bypasses package resolution, strictly installs matching lockfile packages, and wipes out existing `node_modules` first, ensuring complete environmental reliability. Caching `.npm` is superior because it caches raw downloaded tarball packages. If the `node_modules` cache key expires, npm pulls from the local CI tarball cache directly, reducing network lookups and accelerating job run times."
 
-> 🔄 **Related Cross-Question:** "What is the danger of printing environment variables or token values in test reports, and how do you prevent it?"
->
-> **Answer:** "If a test fails and prints the request headers, it might expose the bearer token in the public HTML reports or console logs. We prevent this by writing custom report log sanitizers and using GitLab's masked variables which automatically replace sensitive strings in the console log output with `[MASKED]`."
+### Q19. "Provide a highly optimized, secure `Dockerfile` for Playwright tests."
+> "This Dockerfile features a multi-stage layout. It caches dependency layers, optimizes size, sets up a secure non-root environment, and installs necessary browser libraries."
+
+```dockerfile
+# Stage 1: Build Workspace
+FROM node:20-slim AS builder
+
+WORKDIR /opt/e2e-tests
+
+# Copy dependency mappings first to optimize layer cache
+COPY package*.json ./
+
+# Install clean production dependencies
+RUN npm ci --prefer-offline --no-audit
+
+# Stage 2: Run-time Execution Container
+FROM mcr.microsoft.com/playwright:v1.40.0-jammy AS runner
+
+WORKDIR /opt/e2e-tests
+
+# Copy node modules and project structure from builder
+COPY --from=builder /opt/e2e-tests/node_modules ./node_modules
+COPY . .
+
+# Secure Container: Avoid running as root
+# official image contains a pre-built user 'pwuser'
+RUN chown -R pwuser:pwuser /opt/e2e-tests
+USER pwuser
+
+# Environment parameters
+ENV CI=true
+ENV FORCE_COLOR=1
+
+# Trigger Playwright run
+CMD ["npx", "playwright", "test"]
+```
+
+> > 🔄 **Related Cross-Question:** "How does leveraging multi-stage Docker builds reduce the vulnerability surface area of your final test execution environment?"
+> >
+> > **Answer:** "By separating the build environment from the runtime container, we exclude unnecessary compilation toolchains, package download caches, and source configurations. Our final runner container only contains the target application and pre-compiled node modules. This minimizes container size and removes target vectors for security vulnerabilities."
+
+### Q20. "Explain the importance of shared memory (`--shm-size`) and running under a non-root user."
+> "These are two crucial Docker environment parameters:
+> 1. **Shared Memory (`--shm-size=2gb`):** Chromium-based browsers use shared memory (`/dev/shm`) for rendering pages. The default Docker container limit is a tiny 64MB. Under headless parallel automation, this causes Chromium processes to instantly crash. We must configure our runner container or host execution commands with a minimum of 2GB of shared memory to ensure stable runs.
+> 2. **Non-Root User:** Running E2E tests inside a container as a root user is a critical security vulnerability. If a test compromises a file system or encounters dynamic code execution, it can compromise the CI agent host. Using a dedicated, sandboxed non-root account like `pwuser` isolates the container namespace from the host filesystem."
+
+> > 🔄 **Related Cross-Question:** "If you are running tests inside a secure Docker container, how do you retrieve failure assets (like screenshot PNGs or video mp4s) once the container shuts down and exits?"
+> >
+> > **Answer:** "We map host paths using **Docker Volumes**. When executing the container, we append a mounting parameter: `docker run -v ${PWD}/playwright-report:/opt/e2e-tests/playwright-report my-playwright-image`. This mounts a folder on our host machine directly to the container's output folder. When a test fails and writes artifacts, they are saved directly to the host storage, persisting safely after the container shuts down."
+
+### Q21. "What is your Git branching strategy, and how do you resolve merge conflicts in locks?"
+> "We practice **GitFlow / Trunk-Based Development**.
+> - All active script edits are developed on short-lived feature branches (`feature/add-login-spec`).
+> - When a feature branch is ready, a Merge Request (MR) is opened against `main`. This triggers our GitLab pipeline quality gates.
+> - Merge conflicts inside lockfiles (`package-lock.json` / `yarn.lock`) should never be resolved by manual editing, which corrupts package indexes.
+> - **Lockfile Resolution:** I check out the target branch, pull main, and run `npm install` or `npm audit fix` to let the npm CLI engine regenerate the correct dependency hashes programmatically, ensuring matching package integrity."
+
+> > 🔄 **Related Cross-Question:** "What is a 'git rebase' and when would you choose it over a 'git merge' for your test automation repository?"
+> >
+> > **Answer:** "A `git merge` creates a new merge commit, preserving a branching history. A `git rebase` rewrites history by moving the base of our feature branch to the latest commit on `main`. I choose rebasing for our automation repository to maintain a perfectly clean, linear history. This makes it easier to trace test failures to specific code changes and simplifies rolling back regressions."
+
+### Q22. "How do you implement shift-left quality gates and ensure secret security?"
+> "We implement strict security gates across three layers:
+> 1. **Local Pre-Commit (Husky):** Enforces linting (`eslint`) and runs fast unit checks before a developer can commit code locally.
+> 2. **Secret Scanning:** We integrate GitLab's native secret detection or a tool like `gitleaks` into our pipelines. This scans all commit logs for accidental hardcoded tokens or API credentials, failing the pipeline instantly if a leak is detected.
+> 3. **Secure Pipeline Variables:** Credentials are never hardcoded. They are stored in GitLab's **Masked and Masked Variables** and loaded dynamically as standard environment variables (`process.env.API_KEY`), ensuring they never appear in console outputs."
+
+> > 🔄 **Related Cross-Question:** "What if a test failure log automatically prints request headers, exposing the masked bearer token in public E2E reports? How do you mitigate this?"
+> >
+> > **Answer:** "We build custom logging sanitizers inside our API context hook or report generation classes. This interceptor intercepts request and response payloads before writing them to the trace file, replacing any key containing sensitive patterns (e.g. `Authorization`, `token`, `password`) with a static `[REDACTED]` string. This keeps our reports secure."
 
 ---
 
-## PHASE 6: SCENARIO + CLOSING (2-5 min)
+## PHASE 6: SCENARIOS & CLOSING (3 min)
 
-### Q23. "How would you automate CAPTCHA?"
-> "You **don't** automate CAPTCHA — its purpose is to block automation.
-> - **Disable in QA environments.**
-> - **Use a static bypass token** (`X-Bypass-Captcha: true` header).
-> - **Test login via API** directly, skipping the UI CAPTCHA entirely."
-
-> 🔄 **Related Cross-Question:** "If business stakeholders insist on testing the CAPTCHA flow on production to ensure it's working, how would you handle it?"
->
-> **Answer:** "I would explain that testing CAPTCHA dynamically with OCR/AI solvers violates terms of service and is extremely flaky. Instead, I would recommend running a one-off manual sanity check, or work with the security team to whitelist our automation IP address or configure a specific test account on production that bypasses CAPTCHA when accessed via our secure VPN."
-
-### Q24. "How do you handle K6 performance thresholds?"
-> "K6 thresholds are defined in the `options` object. If `p(95)` response time exceeds 500ms, K6 exits with an error code, which automatically fails the CI pipeline and blocks deployment."
+### Q23. "How would you automate CAPTCHA validation?"
+> "You **don't** automate CAPTCHA. It is explicitly designed to block automation tools.
 > 
-> ```javascript
-> export const options = {
->     thresholds: {
->         http_req_duration: ['p(95)<500'], // 95% of requests must be under 500ms
->     },
-> };
-> ```
+> Attempting to bypass it using OCR or external AI solvers introduces immense flakiness and violates Terms of Service. Instead, we use two industry-standard integration methods:
+> 1. **Bypass Headers:** We configure our backend environment (QA/Staging) to disable CAPTCHA when receiving a secure header, such as `X-Bypass-Captcha: true`.
+> 2. **Sandbox Tokens:** We configure the CAPTCHA provider (like Google reCAPTCHA) with official test sandbox keys that always resolve successfully when receiving a specific test string, allowing us to validate the UI form submission safely."
 
-> 🔄 **Related Cross-Question:** "If a K6 run fails because a single background API request spiked to 2000ms due to a cold start, but the remaining 99% were under 100ms, should it fail the pipeline? How do you prevent this?"
->
-> **Answer:** "This is why we use percentiles (like `p(95)` or `p(99)`) instead of average or max response times in thresholds. A single cold-start spike represents less than 1% of requests and will be ignored by a `p(95)<500` threshold, ensuring the pipeline only fails when there is a systemic performance degradation."
+> > 🔄 **Related Cross-Question:** "If business stakeholders insist on verifying that CAPTCHA works on production, how do you handle it?"
+> >
+> > **Answer:** "I would advise against running automated scripts against production CAPTCHAs. Instead, I would recommend running a one-off manual sanity check during production deployments, or configuring a whitelisted staging VPN IP that bypasses the CAPTCHA block for automated regression checks, ensuring production environment security."
+
+### Q24. "How do you integrate K6 performance testing into your E2E repository?"
+> "Since both our E2E scripts and K6 are built in JavaScript/TypeScript, they share the same repository. We use Node's `child_process.execSync` to trigger K6 inside our test hooks or CI pipelines.
+> 
+> We configure K6 with strict **performance thresholds**. If our 95th percentile response times exceed SLA limits (e.g. `http_req_duration: ['p(95)<500']`), K6 returns a non-zero exit code. This automatically fails the GitLab CI job and blocks the deployment."
+
+```typescript
+// Playwright Teardown hook triggering K6
+import { test } from '@playwright/test';
+import { execSync } from 'child_process';
+
+test.afterAll(async () => {
+    console.log("UI Suite completed. Triggering K6 performance gates...");
+    execSync('k6 run --env TARGET_ENV=QA src/performance/load-test.js', { stdio: 'inherit' });
+});
+```
+
+> > 🔄 **Related Cross-Question:** "What if a performance spike occurs due to a cold start during a K6 run, but the overall service performance is stable? How do you prevent pipeline thrashing?"
+> >
+> > **Answer:** "This is why we avoid using 'average' or 'maximum' response times for thresholds. We define percentiles like `p(95)` or `p(99)`. A single cold start affects less than 1% of transactions, which is ignored by the 95th percentile calculation, ensuring we only fail the pipeline for systemic performance degradations."
 
 ### Q25. "Do you have any questions for us?"
-> 1. "What does the current test infrastructure look like, and what are the immediate pain points you're hoping to solve?"
-> 2. "How does the SDET team collaborate with developers — are there shared ownership models for test coverage?"
-> 3. "What does the CI/CD pipeline look like today, and is there an appetite to integrate K6 performance gates?"
-
-> 🔄 **Related Cross-Question:** "Why did you choose to ask us about the collaboration between SDETs and developers?"
->
-> **Answer:** "Because I believe quality is a shared responsibility, not just an SDET task. I want to see if the team practices true Shift-Left testing, where developers write unit/integration tests and review SDET E2E code, ensuring we build robust, testable software together rather than throwing code over the wall."
+> "Yes, I have three strategic questions:
+> 1. *"How is the testing infrastructure currently hosted at Siemens? Are you primarily running pipelines using containerized Kubernetes nodes or dedicated GitLab runner VMs?"*
+> 2. *"How does the collaboration between developers and SDETs look here? Do developers actively review E2E test code or write component-level tests?"*
+> 3. *"What is the immediate infrastructure or flakiness bottleneck you are hoping to solve with this SDET role?"*
 
 ---
 
-## ⚡ QUICK REVISION TABLE (JD Keyword → Your Answer)
+## ⚡ RAPID KEYWORD CHECKLIST (JD → Your Proof Point)
 
-| JD Requirement | Your Proof Point |
+| Job Description Key Point | Your High-Impact Proof Point |
 |---|---|
-| Playwright + JavaScript | Unified TypeScript framework across UI/API/K6 |
-| API automation through code (not Postman) | Playwright `APIRequestContext` — Strategy 1 & 2 |
-| Clean, scalable test scripts | `type` / `interface` / `abstract class` architecture |
-| CI/CD + Git + YAML | Azure DevOps + GitLab CI YAML + Docker |
-| K6 / Sitespeed.io | K6 triggered from Playwright via `child_process` |
-| Docker images | Microsoft Playwright Docker base image |
-| Hands-on coding (SDET) | Async/Await, Promise combinators, Generics |
-| Agile + Communication | Shift-left gates, JIRA dashboards, 6-person team lead |
-| IoT / Networking (Nice to have) | Lift sync testing via concurrent API simulation |
-| Problem solving | AI CLI self-healing framework (40% effort reduction) |
+| **Playwright (Node.js)** | JS architecture, POM scaling, custom fixtures, shadow DOM piercing |
+| **API Test Automation in Code** | Playwright `APIRequestContext`, dynamic auth state sharing, schema validations (`Ajv`) |
+| **Hands-on JS Programming** | Promises, async closures, Event Loop microtasks, array parsing filters, custom recursive retry backoffs |
+| **GitLab CI/CD Pipelines** | Multi-stage `.gitlab-ci.yml`, dependency caching, matrix sharding/parallelization, GitLab variables |
+| **Docker Images & Containers** | Multi-stage `Dockerfile`, memory allocation (`--shm-size`), non-root container permissions (`pwuser`), Volume mounting |
+| **Git & YAML Configuration** | Trunk-based rebasing, lockfile resolving, YAML anchor structures (`extends`) |
+| **NFR Testing (K6)** | Performance gates triggered via Node `child_process`, SLA percentiles (`p(95)`) |
