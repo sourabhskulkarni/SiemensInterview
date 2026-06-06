@@ -978,10 +978,10 @@ console.log(moveZerosInPlace([2, 0, 0, 0, 3, 0, 0, 5, 0, 7, 6, 0]));
 
 ---
 
-### Q-M7. "Tell me about your quality KPIs and metrics."
+### Q-M7. "Tell me about your quality KPIs, metrics, and Release Governance."
 
 > **Answer:**
-> "I track 5 KPIs:
+> "Release Governance means having a strict 'Quality Gate' before code goes to Production. My pipeline checks these 5 KPIs automatically:
 >
 > | KPI | What it means | My target |
 > |---|---|---|
@@ -1051,6 +1051,36 @@ console.log(moveZerosInPlace([2, 0, 0, 0, 3, 0, 0, 5, 0, 7, 6, 0]));
 > "If a developer changes one line of CSS in the 'Payments' module, we shouldn't run all 5,000 UI tests across the entire hospitality suite. That wastes CI compute and time.
 > 
 > **Smart Test Selection** means our pipeline analyzes the Git commit diff. If the changes are in the `/payments` directory, the GitLab pipeline dynamically selects only tests tagged with `@payments` or tests located in the `tests/payments/` folder. We run a full suite only on nightly builds or merge-to-main. This shift-left approach gives developers feedback in 5 minutes instead of 2 hours."
+
+### Q-M13. "Can you explain the Screenplay Pattern, and how is it different from the Page Object Model (POM)?"
+> **(Targets JD: "test architecture patterns — page object model, screenplay")**
+> 
+> "POM focuses on the **Page** (e.g., `LoginPage.js`). As the page grows, the class becomes a massive, unmaintainable 'God Object' with 100 methods.
+> 
+> **Screenplay Pattern** focuses on the **Actor** and their **Tasks**. Instead of `loginPage.login(user, pass)`, you write: `actor.attemptsTo(Login.with(user, pass))`.
+> 1. **Actor:** Who is doing it (e.g., 'FrontDeskAgent').
+> 2. **Task:** What they are doing (e.g., 'MakeReservation').
+> 3. **Action:** Low-level clicks (e.g., 'Click the submit button').
+> 
+> I use POM for simple CRUD apps. I use Screenplay for highly complex workflow apps (like a Hospitality PMS) because it makes code modular, reusable, and reads exactly like a BDD business requirement."
+
+### Q-M14. "My Playwright tests pass on my local machine but fail randomly in the CI/CD pipeline. How do you troubleshoot this?"
+> **(Targets JD: "cross-browser stability patterns", "flaky-test quarantine")**
+> 
+> "This is the most common issue in automation. When a test fails only in CI, it's almost always a **Race Condition** or **Resource Starvation**.
+> 
+> 1. **Resource Starvation (Docker/CI):** My laptop has 32GB of RAM. The CI container might only have 2GB and a tiny shared memory size. This causes the browser to crash or run extremely slowly. I fix this by setting `--shm-size=2gb` in Docker and ensuring the CI worker isn't running 10 parallel processes when it only has 2 CPU cores.
+> 2. **Race Conditions:** On my fast local machine, the API responds in 50ms. In CI, the API might take 2 seconds. If the test uses a hardcoded `page.waitForTimeout(1000)`, it fails in CI. I fix this by deleting all hardcoded sleeps and using Playwright's `page.waitForResponse('/api/bookings')` to dynamically wait for the exact network call to finish.
+> 3. **Trace Viewer:** If it's still failing, I download the **Playwright Trace file** from the CI artifacts. It shows me exactly what the CI machine saw (DOM, Network, Console) at the exact millisecond it failed."
+
+### Q-M15. "How do you see Agentic AI, RAG, and MCP shaping the future of Test Automation?"
+> **(Crucial for the QA Manager actively building AI solutions)**
+> 
+> "Generative AI (like Copilot) just writes code blocks, but **Agentic AI** acts autonomously.
+> 
+> 1. **Agentic AI:** Instead of me writing step-by-step locator scripts, an Agentic framework takes a prompt: *"Book a standard room for tomorrow."* The agent dynamically explores the DOM, figures out where the calendar is, handles pop-ups autonomously, and completes the flow without strict hardcoded locators. 
+> 2. **RAG (Retrieval-Augmented Generation):** AI struggles with hallucinations. By using RAG, we can feed our internal Confluence PRDs (Product Requirements Documents) and Swagger API specs directly into the LLM context. So when the AI writes a test or investigates a failure, it is looking at our *actual proprietary business rules*, not generic internet data.
+> 3. **MCP (Model Context Protocol):** This is the game-changer for CI/CD. MCP allows our AI agents to securely 'talk' to our internal databases, GitHub repos, and Jira. An AI Agent using MCP could detect a test failure, query the backend DB to see if the test data was corrupted, check Jira for known bugs, and automatically raise a highly-detailed bug report with logs attached—completely autonomously."
 
 ---
 
